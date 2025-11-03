@@ -1,0 +1,187 @@
+name: BE | PR Check & Dynamic QA - Build and Deploy
+
+on:
+  pull_request:
+    branches:
+      - develop # pr into develop
+    types:
+      - opened # pr opened
+      - synchronize # new commit
+      - reopened # pr reopened
+
+env:
+  # GitHub Container Registry
+  IMAGE_NAME: ghcr.io/${{ secrets.GHCR_USER }}/${{ github.event.repository.name }}
+
+jobs:
+  pre-comment:
+    runs-on: self-hosted
+    steps:
+      - name: Add PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const message = `테스트/QA 서버를 배포 중입니다. 기다려주세요. 😊`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
+
+  build-and-push:
+    name: Build, Test and Push Image
+    # Using self-hosted runner
+    runs-on: self-hosted
+    needs: pre-comment
+    outputs:
+      # To use next job(deploy)
+      pr_number: ${{ steps.vars.outputs.pr_number }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'oracle'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Create test application.yaml
+        run: |
+          mkdir -p src/test/resources
+          echo "${{ secrets.APPLICATION_TEST_YAML }}" > src/test/resources/application.yaml
+        shell: bash
+
+      - name: Add executable permission to gradlew
+        run: chmod +x gradlew
+
+      - name: Run Gradle tests
+        run: ./gradlew test
+
+      - name: Set dynamic variables
+        id: vars
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number }}
+          echo "pr_number=${PR_NUMBER}" > $GITHUB_OUTPUT
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GHCR_USER }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and Push docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: .docker/Dockerfile
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:pr-${{ steps.vars.outputs.pr_number }}
+          cache-from: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.IMAGE_NAME }}:buildcache,mode=max
+
+  deploy:
+    name: Deploy to PR Server
+    needs: build-and-push
+    runs-on: self-hosted
+
+    # Set output and secrets received through needs as global variables
+    env:
+      PR_NUMBER: ${{ needs.build-and-push.outputs.pr_number }}
+      TEAM_USER: ${{ secrets.TEAM_USER }}
+      TEAM_PASS: ${{ secrets.TEAM_PASS }}
+      APPLICATION_YAML: ${{ secrets.APPLICATION_TEST_YAML }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set variables
+        run: |
+          export SERVICE_NAME=be-pr-${{ env.PR_NUMBER }}
+          
+          echo "IMAGE_TAG=${{ env.IMAGE_NAME }}:pr-${{ env.PR_NUMBER }}" >> $GITHUB_ENV
+          echo "SERVICE_NAME=$SERVICE_NAME" >> $GITHUB_ENV
+          echo "HOST_NAME=$SERVICE_NAME.${{ secrets.QA_DOMAIN }}" >> $GITHUB_ENV
+          echo "DEPLOY_PATH=/home/${{ secrets.SSH_USER }}/deployments/$SERVICE_NAME" >> $GITHUB_ENV
+
+      - name: Create compose file from template
+        run: |
+          # Use envsubst to replace template variables with real values
+          # Store result into COMPOSE_CONTENT
+          export COMPOSE_CONTENT=$(envsubst < .docker/docker-compose.template.yaml)
+          
+          # Securely forward multi-linear variables to SSH with GitHub Actions masking capabilities
+          echo "COMPOSE_CONTENT<<EOF" >> $GITHUB_ENV
+          echo "$COMPOSE_CONTENT" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Deploy to server via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            # deploy path
+            mkdir -p ${{ env.DEPLOY_PATH }}/config
+            
+            # write compose file from runner
+            echo "[LOG] build compose file ..."
+            cat <<'EOF' > ${{ env.DEPLOY_PATH }}/docker-compose.yaml
+            ${{ env.COMPOSE_CONTENT }}
+            EOF
+
+            # Write application.yaml
+            echo "[LOG] build application.yaml ..."
+            cat <<'EOF' > ${{ env.DEPLOY_PATH }}/config/application.yaml
+            ${{ env.APPLICATION_YAML }}
+            EOF
+
+            # change dir into deploy path
+            cd ${{ env.DEPLOY_PATH }}
+
+            # login ghcr
+            echo "[LOG] log-in Github container registry"
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin
+
+            # pull docker image
+            echo "[LOG] pull docker image"
+            docker pull ${{ env.IMAGE_NAME }}:pr-${{ env.PR_NUMBER }}
+
+            # up docker compose
+            echo "[LOG] docker container up"
+            docker compose -f docker-compose.yaml -p be-pr-${{ env.PR_NUMBER }} up -d --remove-orphans
+
+            # prune unnecessary image
+            docker image prune -f
+  post-comment:
+    needs: deploy
+    runs-on: self-hosted
+    env:
+      PR_NUMBER: ${{ needs.build-and-push.outputs.pr_number }}
+    steps:
+      - name: Add PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const domain = "${{ secrets.QA_DOMAIN }}"
+            const message = `🚀 테스트/QA 서버가 배포되었습니다.\n\n- url: https://be-pr-${{ env.PR_NUMBER }}.${domain}`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });

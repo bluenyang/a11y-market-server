@@ -1,0 +1,54 @@
+name: BE | PR Check - Cleanup
+
+on:
+  pull_request:
+    branches:
+      - develop
+    types:
+      - closed # when pr closed
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: '삭제할 PR 번호 (숫자만 입력)'
+        required: true
+        type: string
+
+jobs:
+  cleanup:
+    name: Cleanup PR Deployment
+    runs-on: self-hosted
+
+    steps:
+      - name: Set dynamic variables
+        id: vars
+        run: |
+          PR_NUMBER=${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+          SERVICE_NAME="be-pr-${PR_NUMBER}"
+          
+          echo "service_name=$SERVICE_NAME" >> $GITHUB_OUTPUT
+
+      - name: Cleanup server resources via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            SERVICE_NAME=${{ steps.vars.outputs.service_name }}
+            DEPLOY_PATH="/home/${{ secrets.SSH_USER }}/deployments/$SERVICE_NAME"
+            
+            echo "[LOG] Attempting to cleanup project: $SERVICE_NAME"
+            # Attempt to stop and remove with container name and fallback
+            docker stop "$SERVICE_NAME" || echo "[LOG] Container $SERVICE_NAME not found or already stopped."
+            docker rm "$SERVICE_NAME" || echo "[LOG] Container $SERVICE_NAME not found or already removed."
+            
+            # 2. Cleanup deploy directory
+            if [ -d "$DEPLOY_PATH" ]; then
+              echo "[LOG] Removing deployment directory: $DEPLOY_PATH"
+              rm -rf "$DEPLOY_PATH"
+            else
+              echo "[LOG] Deployment directory not found: $DEPLOY_PATH"
+            fi
+            
+            echo "[LOG] Cleanup for $SERVICE_NAME finished"
