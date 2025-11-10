@@ -1,33 +1,31 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.auth.service;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.LoginDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.model.User;
+import com.multicampus.gamesungcoding.a11ymarketserver.user.model.Users;
 import com.multicampus.gamesungcoding.a11ymarketserver.user.repository.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
+@RequiredArgsConstructor
 public class AuthService {
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-//    private final PasswordEncoder pwdEncoder = new BCryptPasswordEncoder();
-
-    public User login(LoginDTO dto) {
+    public Users login(LoginDTO dto) {
         String email = dto.getEmail();
         String password = dto.getPassword();
 
-        Optional<User> optionalUser = userRepository.findByUserEmail(email);
+        var optionalUser = userRepository.findByUserEmail(email);
 
         if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
+            Users user = optionalUser.get();
 
 
-//            if (passwordEncoder.matches(password, user.getUserPass())) {
-//                return user;
-//            }
+            if (passwordEncoder.matches(password, user.getUserPass())) {
+                return user;
+            }
         }
 
         return null;
