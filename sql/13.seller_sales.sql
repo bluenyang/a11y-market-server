@@ -53,8 +53,3 @@ CREATE OR REPLACE VIEW seller_sales_view AS
      LEFT JOIN order_items oi
    ON p.product_id = oi.product_id
     GROUP BY s.seller_id;
-
-SELECT *
-  FROM seller_sales_view;
-
-DROP VIEW seller_sales_view;

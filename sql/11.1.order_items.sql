@@ -12,5 +12,3 @@ CREATE TABLE order_items (
    CONSTRAINT fk_orderitem_product FOREIGN KEY ( product_id )
       REFERENCES products ( product_id )
 );
-
-DROP TABLE order_items;

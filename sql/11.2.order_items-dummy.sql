@@ -359,9 +359,3 @@ INSERT INTO order_items (
      FROM dual;
 
 COMMIT;
-
-SELECT *
-  FROM order_items;
-
-DELETE FROM order_items;
-COMMIT;

@@ -6,5 +6,3 @@ CREATE TABLE default_addresses (
    CONSTRAINT fk_default_addresses FOREIGN KEY ( address_id )
       REFERENCES addresses ( address_id )
 );
-
-DROP TABLE default_addresses;

@@ -8,5 +8,3 @@ CREATE TABLE cart_items (
    CONSTRAINT fk_cart_item_cart FOREIGN KEY ( cart_id )
       REFERENCES carts ( cart_id )
 );
-
-DROP TABLE cart_items;

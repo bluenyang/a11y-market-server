@@ -1,0 +1,14 @@
+DROP TABLE seller_sales;
+DROP TABLE a11y_profiles;
+DROP TABLE order_items;
+DROP TABLE orders;
+DROP TABLE cart_items;
+DROP TABLE carts;
+DROP TABLE product_images;
+DROP TABLE products;
+DROP TABLE categories;
+DROP TABLE sellers;
+DROP TABLE default_addresses;
+DROP TABLE addresses;
+DROP TABLE user_oauth_links;
+DROP TABLE users;

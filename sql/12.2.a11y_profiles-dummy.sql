@@ -53,8 +53,3 @@ INSERT INTO a11y_profiles (
      FROM dual;
 
 COMMIT;
-
-SELECT *
-  FROM a11y_profiles;
-
-DELETE FROM a11y_profiles;

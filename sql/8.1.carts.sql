@@ -4,5 +4,3 @@ CREATE TABLE carts (
    CONSTRAINT fk_cart_user FOREIGN KEY ( user_id )
       REFERENCES users ( user_id )
 );
-
-DROP TABLE carts;

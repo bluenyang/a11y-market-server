@@ -59,8 +59,3 @@ INSERT INTO cart_items (
      FROM dual;
 
 COMMIT;
-
-SELECT *
-  FROM cart_items;
-
-DELETE FROM cart_items;

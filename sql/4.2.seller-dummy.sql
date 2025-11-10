@@ -9,7 +9,6 @@ INSERT INTO sellers (
    seller_submit_status,
    submit_date,
    approved_date,
-   created_at,
    updated_at
 )
    SELECT hextoraw('019a69f1f60c73ab8d829233d471597d'),
@@ -20,7 +19,6 @@ INSERT INTO sellers (
           '강철처럼 튼튼한 제품을 판매합니다.',
           1,
           'APPROVED',
-          current_timestamp,
           current_timestamp,
           current_timestamp,
           current_timestamp
@@ -36,7 +34,6 @@ INSERT INTO sellers (
           'APPROVED',
           current_timestamp,
           current_timestamp,
-          current_timestamp,
           current_timestamp
      FROM dual
    UNION ALL
@@ -50,14 +47,7 @@ INSERT INTO sellers (
           'APPROVED',
           current_timestamp,
           current_timestamp,
-          current_timestamp,
           current_timestamp
      FROM dual;
 
-COMMIT;
-
-SELECT *
-  FROM sellers;
-
-DELETE FROM sellers;
 COMMIT;

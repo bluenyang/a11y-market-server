@@ -120,9 +120,3 @@ INSERT INTO users (
      FROM dual;
 
 COMMIT;
-
-SELECT *
-  FROM users;
-
-DELETE FROM users;
-COMMIT;

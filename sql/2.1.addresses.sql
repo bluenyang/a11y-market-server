@@ -11,5 +11,3 @@ CREATE TABLE addresses (
    CONSTRAINT fk_address_user FOREIGN KEY ( user_id )
       REFERENCES users ( user_id )
 );
-
-DROP TABLE addresses;

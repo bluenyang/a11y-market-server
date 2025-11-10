@@ -5,5 +5,3 @@ CREATE TABLE categories (
    CONSTRAINT fk_parent_cat FOREIGN KEY ( parent_cat_id )
       REFERENCES categories ( category_id )
 );
-
-DROP TABLE categories;

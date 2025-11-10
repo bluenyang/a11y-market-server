@@ -39,9 +39,3 @@ INSERT INTO default_addresses (
      FROM dual;
 
 COMMIT;
-
-SELECT *
-  FROM default_addresses;
-
-DELETE FROM default_addresses;
-COMMIT;

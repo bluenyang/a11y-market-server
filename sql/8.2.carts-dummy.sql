@@ -23,8 +23,3 @@ INSERT INTO carts (
      FROM dual;
 
 COMMIT;
-
-SELECT *
-  FROM carts;
-
-DELETE FROM carts;

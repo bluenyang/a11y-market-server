@@ -14,7 +14,7 @@ INSERT INTO addresses (
           '집',
           '김철수',
           '010-1234-5671',
-          12345,
+          '12345',
           '서울시 강남구 테헤란로 1',
           '101동 101호',
           current_timestamp
@@ -25,7 +25,7 @@ INSERT INTO addresses (
           '집',
           '이영희',
           '010-1234-5672',
-          23456,
+          '23456',
           '서울시 서초구 반포대로 2',
           '202동 202호',
           current_timestamp
@@ -36,7 +36,7 @@ INSERT INTO addresses (
           '집',
           '박지성',
           '010-1234-5673',
-          34567,
+          '34567',
           '경기도 수원시 영통구 3',
           '303동 303호',
           current_timestamp
@@ -47,7 +47,7 @@ INSERT INTO addresses (
           '박지성 사무실',
           '박지성 (사무실)',
           '010-9876-5432',
-          45678,
+          '45678',
           '서울시 중구 세종대로 4',
           NULL,
           current_timestamp
@@ -58,7 +58,7 @@ INSERT INTO addresses (
           '집',
           '최민식',
           '010-1234-5674',
-          56789,
+          '56789',
           '부산시 해운대구 5',
           '505동 505호',
           current_timestamp
@@ -69,7 +69,7 @@ INSERT INTO addresses (
           '집',
           '유재석',
           '010-1234-5675',
-          67890,
+          '67890',
           '서울시 마포구 상암동 6',
           '606동 606호',
           current_timestamp
@@ -80,7 +80,7 @@ INSERT INTO addresses (
           '집',
           '아이유',
           '010-1234-5676',
-          78901,
+          '78901',
           '서울시 강남구 청담동 7',
           '707동 707호',
           current_timestamp
@@ -91,7 +91,7 @@ INSERT INTO addresses (
           '집',
           '손흥민',
           '010-1234-5677',
-          89012,
+          '89012',
           '강원도 춘천시 8',
           '808동 808호',
           current_timestamp
@@ -102,7 +102,7 @@ INSERT INTO addresses (
           '집',
           '김연아',
           '010-1234-5678',
-          90123,
+          '90123',
           '경기도 군포시 9',
           '909동 909호',
           current_timestamp
@@ -113,7 +113,7 @@ INSERT INTO addresses (
           '집',
           '이순신',
           '010-1234-5679',
-          11234,
+          '11234',
           '전라남도 여수시 10',
           '1010동 1010호',
           current_timestamp
@@ -124,7 +124,7 @@ INSERT INTO addresses (
           '회사',
           '김철수 (회사)',
           '010-1111-1111',
-          54321,
+          '54321',
           '서울시 강남구 테헤란로 200',
           '강남파이낸스센터',
           current_timestamp
@@ -135,7 +135,7 @@ INSERT INTO addresses (
           '본가',
           '김철수 (본가)',
           '010-2222-2222',
-          54322,
+          '54322',
           '경기도 성남시 분당구',
           '101동 202호',
           current_timestamp
@@ -146,7 +146,7 @@ INSERT INTO addresses (
           '사무실',
           '이영희 (사무실)',
           '010-3333-3333',
-          65432,
+          '65432',
           '서울시 서초구 서초대로 300',
           '사무실 5층',
           current_timestamp
@@ -157,7 +157,7 @@ INSERT INTO addresses (
           '유재석 물류센터',
           '유재석 (물류센터)',
           '010-4444-4444',
-          76543,
+          '76543',
           '경기도 이천시 물류단지',
           'A동 101',
           current_timestamp
@@ -168,7 +168,7 @@ INSERT INTO addresses (
           '박지성 본사',
           '박지성 (본사)',
           '010-5555-5555',
-          87654,
+          '87654',
           '서울시 종로구 세종대로 100',
           '광화문빌딩',
           current_timestamp
@@ -179,7 +179,7 @@ INSERT INTO addresses (
           '작업실',
           '아이유 (작업실)',
           '010-6666-6666',
-          98765,
+          '98765',
           '서울시 성동구 성수동',
           '스튜디오 301호',
           current_timestamp
@@ -190,7 +190,7 @@ INSERT INTO addresses (
           '본가',
           '아이유 (본가)',
           '010-7777-7777',
-          12121,
+          '12121',
           '경기도 과천시',
           '주택',
           current_timestamp
@@ -201,7 +201,7 @@ INSERT INTO addresses (
           '제주도 별장',
           '이지은 (실명배송)',
           '010-8888-8888',
-          34343,
+          '34343',
           '제주도 제주시 애월읍',
           '별장',
           current_timestamp
@@ -212,7 +212,7 @@ INSERT INTO addresses (
           '거제도 숙소',
           '이순신 (거제도)',
           '010-9999-9999',
-          45454,
+          '45454',
           '경상남도 거제시',
           '조선소 근처',
           current_timestamp
@@ -223,16 +223,10 @@ INSERT INTO addresses (
           '서울 숙소',
           '이순신 (서울숙소)',
           '010-0000-0000',
-          56565,
+          '56565',
           '서울시 동작구 노량진동',
           '오피스텔',
           current_timestamp
      FROM dual;
 
-COMMIT;
-
-SELECT *
-  FROM addresses;
-
-DELETE FROM addresses;
 COMMIT;

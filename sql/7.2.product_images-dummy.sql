@@ -99,28 +99,28 @@ INSERT INTO product_images (
    SELECT hextoraw('019a69fb7a5b7955a7a19585ff96d1e2'),
           hextoraw('019a69f5c3c07f83bcef1a508d05263f'),
           'https://minio.bluenyang.kr/test-images/img%2F1014.jpg',
-          '스마트폰 보조배터리 20000mAh 대표 이미지',
+          NULL,
           current_timestamp
      FROM dual
    UNION ALL
    SELECT hextoraw('019a69fb7a5b765e9b6cfd521018db29'),
           hextoraw('019a69f5c3c07d838b893fb3ed04228d'),
           'https://minio.bluenyang.kr/test-images/img%2F1015.jpg',
-          '영희네 남성 옥스포드 셔츠 대표 이미지',
+          NULL,
           current_timestamp
      FROM dual
    UNION ALL
    SELECT hextoraw('019a69fb7a5b7c02b064fe849dfa57a7'),
           hextoraw('019a69f5c3c07d7aa40bc8bc7dd56c27'),
           'https://minio.bluenyang.kr/test-images/img%2F1001.jpg',
-          '영희네 남성 슬랙스 (블랙) 대표 이미지',
+          NULL,
           current_timestamp
      FROM dual
    UNION ALL
    SELECT hextoraw('019a69fb7a5b751bb03fb390d7a71add'),
           hextoraw('019a69f5c3c0725c85edf652b98f9cfb'),
           'https://minio.bluenyang.kr/test-images/img%2F1002.jpg',
-          '영희네 남성 반팔 티셔츠 (네이비) 대표 이미지',
+          NULL,
           current_timestamp
      FROM dual
    UNION ALL
@@ -302,7 +302,7 @@ INSERT INTO product_images (
    SELECT hextoraw('019a69fb7a5b78779c6932d9c80c06f4'),
           hextoraw('019a69f5c3c071ab8ec90ab9db76a800'),
           'https://minio.bluenyang.kr/test-images/img%2F1013.jpg',
-          '산소탱크 캠핑용 코펠 (4인용) 대표 이미지',
+          NULL,
           current_timestamp
      FROM dual
    UNION ALL
@@ -316,28 +316,28 @@ INSERT INTO product_images (
    SELECT hextoraw('019a69fb7a5b71c88e992b3cfbc3bfad'),
           hextoraw('019a69f5c3c07fa5932ab1b9515efa64'),
           'https://minio.bluenyang.kr/test-images/img%2F1015.jpg',
-          '산소탱크 축구화 (FG 스터드) 대표 이미지',
+          NULL,
           current_timestamp
      FROM dual
    UNION ALL
    SELECT hextoraw('019a69fb7a5b7f0ca094ad1c9b9c227b'),
           hextoraw('019a69f5c3c0769fb19f89840437d235'),
           'https://minio.bluenyang.kr/test-images/img%2F1001.jpg',
-          '산소탱크 축구화 (TF 스터드) 대표 이미지',
+          NULL,
           current_timestamp
      FROM dual
    UNION ALL
    SELECT hextoraw('019a69fb7a5b79d9a491dae792dc06e2'),
           hextoraw('019a69f5c3c076d29b87cd61fd7c9189'),
           'https://minio.bluenyang.kr/test-images/img%2F1002.jpg',
-          '산소탱크 골키퍼 장갑 (프로용) 대표 이미지',
+          NULL,
           current_timestamp
      FROM dual
    UNION ALL
    SELECT hextoraw('019a69fb7a5b71618f858cc502d5c8f6'),
           hextoraw('019a69f5c3c07e5f98d88b4833f6c54a'),
           'https://minio.bluenyang.kr/test-images/img%2F1003.jpg',
-          '산소탱크 축구 유니폼 (레드) 대표 이미지',
+          NULL,
           current_timestamp
      FROM dual
    UNION ALL
@@ -355,10 +355,4 @@ INSERT INTO product_images (
           current_timestamp
      FROM dual;
 
-COMMIT;
-
-SELECT *
-  FROM product_images;
-
-DELETE FROM product_images;
 COMMIT;

@@ -54,9 +54,3 @@ INSERT INTO categories (
      FROM dual;
 
 COMMIT;
-
-SELECT *
-  FROM categories;
-
-DELETE FROM categories;
-COMMIT;
