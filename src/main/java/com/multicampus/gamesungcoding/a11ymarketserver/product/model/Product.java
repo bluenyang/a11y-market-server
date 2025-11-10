@@ -1,10 +1,14 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.product.model;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -29,20 +33,20 @@ public class Product {
      * PK: UUID 36자
      */
     @Id
-    @Column(name = "product_id", nullable = false, updatable = false, length = 36)
-    private String productId;
+    @Column(nullable = false, updatable = false, length = 16)
+    private UUID productId;
 
     /**
      * FK: 판매자
      */
-    @Column(name = "seller_id", length = 36)
-    private String sellerId;
+    @Column(name = "seller_id", length = 16)
+    private UUID sellerId;
 
     /**
      * FK: 카테고리
      */
-    @Column(name = "category_id", length = 36)
-    private String categoryId;
+    @Column(name = "category_id", length = 16)
+    private UUID categoryId;
 
     /**
      * 가격 (NULL 허용 → Integer)
@@ -84,10 +88,16 @@ public class Product {
      * 생성/수정 시각 (JPA Auditing)
      */
     @CreatedDate
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @Column(name = "submit_date", updatable = false)
+    private LocalDateTime submitDate;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @Column(name = "approved_date", updatable = false)
+    private LocalDateTime approvedDate;
 
     @LastModifiedDate
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
@@ -97,7 +107,7 @@ public class Product {
     @PrePersist
     private void prePersist() {
         if (this.productId == null) {
-            this.productId = UUID.randomUUID().toString();
+            this.productId = UUID.randomUUID();
         }
     }
 
