@@ -16,12 +16,12 @@ public class AddressResponse {
     private String addressName;
     private String receiverName;
     private String receiverPhone;
-    private Integer receiverZipcode;
+    private String receiverZipcode;
     private String receiverAddr1;
     private String receiverAddr2;
     private LocalDateTime createdAt;
 
-    public static AddressResponse from(Address address) {
+    public static AddressResponse fromEntity(Addresses address) {
         return AddressResponse.builder()
                 .addressId(address.getAddressId())
                 .userId(address.getUserId())

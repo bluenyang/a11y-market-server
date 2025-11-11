@@ -1,6 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.address.repository;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.address.model.Address;
+import com.multicampus.gamesungcoding.a11ymarketserver.address.model.Addresses;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,11 +9,11 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-public interface AddressRepository extends JpaRepository<Address, UUID> {
+public interface AddressRepository extends JpaRepository<Addresses, UUID> {
     // 전체 배송지 조회 (최신순)
-    List<Address> findByUserIdOrderByCreatedAtDesc(UUID userId);
+    List<Addresses> findByUserIdOrderByCreatedAtDesc(UUID userId);
 
     // 사용자 특정 배송지 조회
-    Optional<Address> findByAddressIdAndUserId(UUID addressId, UUID userId);
+    Optional<Addresses> findByAddressIdAndUserId(UUID addressId, UUID userId);
 
 }
