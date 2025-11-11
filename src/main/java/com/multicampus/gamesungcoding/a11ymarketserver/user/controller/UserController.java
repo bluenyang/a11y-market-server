@@ -1,32 +1,53 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.user.controller;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.user.model.UserDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.user.model.UserRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.user.model.UserResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
 public class UserController {
     private final UserService userService;
-    
+
+    // 회원 정보 조회
     @GetMapping("/v1/users/me")
-    public ResponseEntity<UserDTO> getUserInfo(HttpSession session) {
-        String userId = (String) session.getAttribute("userId");
-        UserDTO userDTO = userService.getUserInfo(userId);
-        return ResponseEntity.ok(userDTO);
+    public ResponseEntity<UserResponse> getUserInfo(HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+        
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserResponse response = userService.getUserInfo(userId);
+        return ResponseEntity.ok(response);
     }
 
+    // 회원 정보 수정
     @PatchMapping("/v1/users/me")
-    public ResponseEntity<UserDTO> updateUserInfo(
+    public ResponseEntity<UserResponse> updateUserInfo(
             HttpSession session,
-            @RequestBody UserDTO userDTO) {
-        String userId = (String) session.getAttribute("userId");
-        UserDTO updateUser = userService.updateUserInfo(userId, userDTO);
-        return ResponseEntity.ok(updateUser);
+            @Valid @RequestBody UserRequest request) {
+
+        UUID userId = (UUID) session.getAttribute("userId");
+
+        if (userId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        UserResponse response = userService.updateUserInfo(userId, request);
+        return ResponseEntity.ok(response);
     }
+
 
 }

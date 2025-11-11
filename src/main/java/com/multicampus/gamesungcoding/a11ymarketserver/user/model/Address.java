@@ -1,28 +1,29 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.user.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Table(name = "address")
+@EntityListeners(AuditingEntityListener.class)
+
 public class Address {
     @Id
-    @Column(length = 36)
-    private String addressId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(length = 16, updatable = false, nullable = false)
+    private UUID addressId;
 
-    @Column(length = 36, nullable = false)
-    private String userId;
+    @Column(length = 16, updatable = false, nullable = false)
+    private UUID userId;
 
     @Column(length = 30)
     private String receiverName;
@@ -40,27 +41,24 @@ public class Address {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     // 배송지 정보 수정
-    public void updateAddrInfo(String receiverName, String receiverPhone,
-                               Integer receiverZipcode, String receiverAddr1, String receiverAddr2) {
-
-        if (receiverName != null) {
-            this.receiverName = receiverName;
+    public void updateAddrInfo(AddressRequest request) {
+        if (request.getReceiverName() != null) {
+            this.receiverName = request.getReceiverName();
         }
-        if (receiverPhone != null) {
-            this.receiverPhone = receiverPhone;
+        if (request.getReceiverPhone() != null) {
+            this.receiverPhone = request.getReceiverPhone();
         }
-        if (receiverZipcode != null) {
-            this.receiverZipcode = receiverZipcode;
+        if (request.getReceiverZipcode() != null) {
+            this.receiverZipcode = request.getReceiverZipcode();
         }
-        if (receiverAddr1 != null) {
-            this.receiverAddr1 = receiverAddr1;
+        if (request.getReceiverAddr1() != null) {
+            this.receiverAddr1 = request.getReceiverAddr1();
         }
-        if (receiverAddr2 != null) {
-            this.receiverAddr2 = receiverAddr2;
+        if (request.getReceiverAddr2() != null) {
+            this.receiverAddr2 = request.getReceiverAddr2();
         }
-
     }
 }

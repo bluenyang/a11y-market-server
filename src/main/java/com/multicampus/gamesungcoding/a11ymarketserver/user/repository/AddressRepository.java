@@ -6,13 +6,14 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface AddressRepository extends JpaRepository<Address, String> {
+public interface AddressRepository extends JpaRepository<Address, UUID> {
     // 전체 배송지 조회 (최신순)
-    List<Address> findByUserIdOrderByCreatedAtDesc(String userId);
+    List<Address> findByUserIdOrderByCreatedAtDesc(UUID userId);
 
     // 사용자 특정 배송지 조회
-    Optional<Address> findByAddressIdAndUserId(String addressId, String userId);
+    Optional<Address> findByAddressIdAndUserId(UUID addressId, UUID userId);
 
 }

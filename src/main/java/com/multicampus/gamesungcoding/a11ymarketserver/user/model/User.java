@@ -1,26 +1,29 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.user.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.*;
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Getter
-@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "users")
+@EntityListeners(AuditingEntityListener.class)
 public class User {
     @Id
-    @Column(length = 36)
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(length = 16, updatable = false, nullable = false)
+    private UUID userId;
 
     @Column(length = 30)
     private String userName;
@@ -42,25 +45,25 @@ public class User {
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private Date createdAt;
+    private LocalDateTime createdAt;
 
     @LastModifiedDate
     @Column(nullable = false)
-    private Date updatedAt;
+    private LocalDateTime updatedAt;
 
     // 회원 정보 수정
-    public void updateUserInfo(String userName, String userEmail, String userPhone, String userNickname) {
-        if (userName != null) {
-            this.userName = userName;
+    public void updateUserInfo(UserRequest request) {
+        if (request.getUserName() != null) {
+            this.userName = request.getUserName();
         }
-        if (userEmail != null) {
-            this.userEmail = userEmail;
+        if (request.getUserEmail() != null) {
+            this.userEmail = request.getUserEmail();
         }
-        if (userPhone != null) {
-            this.userPhone = userPhone;
+        if (request.getUserPhone() != null) {
+            this.userPhone = request.getUserPhone();
         }
-        if (userNickname != null) {
-            this.userNickname = userNickname;
+        if (request.getUserNickname() != null) {
+            this.userNickname = request.getUserNickname();
         }
     }
 
