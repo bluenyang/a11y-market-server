@@ -1,4 +1,4 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.cart.model;
+package com.multicampus.gamesungcoding.a11ymarketserver.cart.dto;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class CartQtyUpdateRequest {
-    @NotNull @Min(1)
+    @NotNull
+    @Min(1)
     private Integer quantity;
 }

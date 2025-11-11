@@ -1,11 +1,12 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.cart.controller;
 
 
-import com.multicampus.gamesungcoding.a11ymarketserver.cart.model.CartAddRequest;
-import com.multicampus.gamesungcoding.a11ymarketserver.cart.model.CartDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.cart.model.CartItemsResponse;
-import com.multicampus.gamesungcoding.a11ymarketserver.cart.model.CartQtyUpdateRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.cart.dto.CartAddRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.cart.dto.CartDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.cart.dto.CartItemsResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.cart.dto.CartQtyUpdateRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.cart.service.CartService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -28,9 +29,9 @@ public class CartController {
 
     // GET /api/v1/cart 목록 조회 기능
     @GetMapping("/v1/cart/me")
-    public ResponseEntity<CartItemsResponse> getCart(
-            @RequestParam("userId") @NotNull UUID userId
-    ) {
+    public ResponseEntity<CartItemsResponse> getCart(HttpSession session) {
+        UUID userId = (UUID) session.getAttribute("userId");
+
         List<CartDTO> items = cartService.getCartItems(userId);
         int total = cartService.getCartTotal(userId);
 
@@ -44,11 +45,10 @@ public class CartController {
 
     // POST /api/v1/cart/items 상품 검색 기능
     @PostMapping("/v1/cart/items")
-    public ResponseEntity<CartDTO> addItem(
-            @Valid @RequestBody CartAddRequest req //
-    ) {
+    public ResponseEntity<CartDTO> addItem(@Valid @RequestBody CartAddRequest req) {
         CartDTO created = cartService.addItem(req);
-        return ResponseEntity.created(URI.create("/api/v1/cart/items/" + created.getCartItemId()))
+        return ResponseEntity
+                .created(URI.create("/api/v1/cart/items/" + created.getCartItemId()))
                 .body(created);
     }
 
