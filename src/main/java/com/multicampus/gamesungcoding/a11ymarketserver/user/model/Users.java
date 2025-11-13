@@ -1,5 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.user.model;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.config.id.UuidV7;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +21,7 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 public class Users {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @UuidV7
     @Column(length = 16, updatable = false, nullable = false)
     private UUID userId;
 

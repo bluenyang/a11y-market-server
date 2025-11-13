@@ -1,5 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.cart.entity;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.config.id.UuidV7;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,17 +14,18 @@ import java.util.UUID;
 public class CartItems {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @UuidV7
+    @Column(length = 16, updatable = false, nullable = false)
     private UUID cartItemId;                 // 장바구니 아이템 PK
 
     @Column(nullable = false)
-    private UUID cartId;        // 사용자/회원 ID
+    private UUID cartId;
 
     @Column(nullable = false)
-    private UUID productId;          // 상품 ID
+    private UUID productId;
 
     @Column(nullable = false)
-    private Integer quantity;        // 수량
+    private Integer quantity;
 
     public void changeQuantity(int quantity) {
         if (quantity < 1) {

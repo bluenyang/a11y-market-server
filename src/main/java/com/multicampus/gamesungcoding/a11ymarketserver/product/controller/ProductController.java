@@ -7,13 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/**
- * 단일 엔드포인트로 목록/검색 처리.
- * - GET /api/v1/products
- * · 전체: /api/v1/products
- * · 키워드: /api/v1/products?search=건강
- * · (향후) 인증/등급: /api/v1/products?certified=true&grade=우수
- */
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")

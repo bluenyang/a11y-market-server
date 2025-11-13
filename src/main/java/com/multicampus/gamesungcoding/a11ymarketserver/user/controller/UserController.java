@@ -66,6 +66,4 @@ public class UserController {
         UserResponse response = userService.updateUserInfo(userId, request);
         return ResponseEntity.ok(response);
     }
-
-
 }

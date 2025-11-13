@@ -44,7 +44,7 @@ public class CartService {
                     return existing;
                 })
                 .orElseGet(() -> CartItems.builder()
-                        .cartItemId(UUID.randomUUID())
+                        //.cartItemId(UUID.randomUUID())
                         .cartId(cartId)
                         .productId(req.getProductId())
                         .quantity(req.getQuantity())
@@ -72,7 +72,7 @@ public class CartService {
         return cartRepository.findByUserId(userId)
                 .map(Cart::getCartId)
                 .orElseGet(() -> cartRepository.save(Cart.builder()
-                                .cartId(UUID.randomUUID())
+                                //.cartId(UUID.randomUUID())
                                 .userId(userId)
                                 .build())
                         .getCartId()

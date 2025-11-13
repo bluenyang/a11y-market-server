@@ -2,7 +2,6 @@ package com.multicampus.gamesungcoding.a11ymarketserver.auth.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.*;
 import com.multicampus.gamesungcoding.a11ymarketserver.auth.service.AuthService;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.model.Users;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,20 +17,11 @@ public class AuthController {
 
     @PostMapping("/v1/auth/login")
     public ResponseEntity<Object> login(@RequestBody LoginDTO dto, HttpSession session) {
-        Users user = authService.login(dto);
+        var user = authService.login(dto);
         // 로그인 성공
         if (user != null) {
             session.setAttribute("loginUser", user);
-
-            var userResp = UserRespDTO.builder()
-                    .userId(user.getUserId())
-                    .userName(user.getUserName())
-                    .userEmail(user.getUserEmail())
-                    .userNickname(user.getUserNickname())
-                    .userRole(user.getUserRole())
-                    .build();
-
-            return ResponseEntity.ok(userResp); // 200 ok와 JSON 반환
+            return ResponseEntity.ok(user); // 200 ok와 JSON 반환
         } else {
             var errBody = LoginErrResponse.builder()
                     .message("이메일 또는 비밀번호가 올바르지 않습니다.")

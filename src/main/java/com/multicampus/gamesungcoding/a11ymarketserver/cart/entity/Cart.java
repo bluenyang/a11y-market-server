@@ -1,5 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.cart.entity;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.config.id.UuidV7;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @Table(name = "carts")
 public class Cart {
     @Id
+    @UuidV7
     @Column(length = 16, updatable = false, nullable = false)
     private UUID cartId;
 

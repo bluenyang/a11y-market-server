@@ -1,6 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.address.model;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.converter.TrimmedStringConverter;
+import com.multicampus.gamesungcoding.a11ymarketserver.config.id.UuidV7;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,7 +18,7 @@ import java.util.UUID;
 @EntityListeners(AuditingEntityListener.class)
 public class Addresses {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @UuidV7
     @Column(length = 16, updatable = false, nullable = false)
     private UUID addressId;
 

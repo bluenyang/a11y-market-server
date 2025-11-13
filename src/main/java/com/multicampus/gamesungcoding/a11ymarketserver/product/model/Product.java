@@ -1,5 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.product.model;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.config.id.UuidV7;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,6 +34,7 @@ public class Product {
      * PK: UUID 36자
      */
     @Id
+    @UuidV7
     @Column(nullable = false, updatable = false, length = 16)
     private UUID productId;
 
