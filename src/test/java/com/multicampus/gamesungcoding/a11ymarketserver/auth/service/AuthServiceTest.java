@@ -1,36 +1,109 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.auth.service;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.JoinRequestDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.LoginDTO;
 import com.multicampus.gamesungcoding.a11ymarketserver.user.model.Users;
 import com.multicampus.gamesungcoding.a11ymarketserver.user.repository.UserRepository;
-import jakarta.transaction.Transactional;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-@SpringBootTest
-@Transactional
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+
+@ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
-    @Autowired
+    @InjectMocks
+    private AuthService authService;
+
+    @Mock
     private UserRepository userRepository;
 
-    @Test
-    @DisplayName("사용자 저장 및 조회 테스트")
-    void saveAndSearchUserTest() {
-        Users user = Users.builder()
-                .userEmail("user1@example.com")
-                .userPass("password123")
+    @Mock
+    private PasswordEncoder passwordEncoder;
+
+    private final UUID mockUserId = UUID.randomUUID();
+    private final String mockEmail = "user1@example.com";
+    private Users mockUser;
+
+    @BeforeEach
+    void setUp() {
+        // 추가적인 설정이 필요한 경우 여기에 작성
+        this.mockUser = Users.builder()
+                .userId(this.mockUserId)
+                .userEmail(this.mockEmail)
+                .userPass("encodedPassword")
                 .userName("User One")
                 .userNickname("user-one")
-                .userPhone("01023456789")
+                .userPhone("010-1234-5678")
+                .userRole("USER")
+                .build();
+    }
+
+    @Test
+    @DisplayName("로그인 성공 테스트")
+    void loginSuccessTest() {
+        var loginDto = LoginDTO.builder()
+                .email(this.mockEmail)
+                .password("password123!")
                 .build();
 
-        Users savedUser = userRepository.save(user);
-        Users foundUser = userRepository.findById(savedUser.getUserId()).orElse(null);
+        given(this.userRepository.findByUserEmail(this.mockEmail))
+                .willReturn(Optional.of(this.mockUser));
+        given(this.passwordEncoder.matches(loginDto.getPassword(), this.mockUser.getUserPass()))
+                .willReturn(true);
 
-        Assertions.assertThat(foundUser).isNotNull();
-        Assertions.assertThat(foundUser.getUserEmail()).isEqualTo("user1@example.com");
-        Assertions.assertThat(foundUser.getUserId()).isEqualTo(savedUser.getUserId());
+        var userRespDTO = this.authService.login(loginDto);
+
+        assertThat(userRespDTO).isNotNull();
+        assertThat(userRespDTO.getUserEmail()).isEqualTo(this.mockEmail);
+        assertThat(userRespDTO.getUserId()).isEqualTo(this.mockUserId);
+    }
+
+    @Test
+    @DisplayName("로그인 실패 테스트 - 잘못된 비밀번호")
+    void loginFailWrongPasswordTest() {
+        var loginDto = LoginDTO.builder()
+                .email(this.mockEmail)
+                .password("WrongPassword!")
+                .build();
+
+        given(this.userRepository.findByUserEmail(this.mockEmail))
+                .willReturn(Optional.of(this.mockUser));
+
+        assertThat(this.authService.login(loginDto))
+                .isNull();
+    }
+
+    @Test
+    @DisplayName("회원가입 성공 테스트")
+    void joinSuccessTest() {
+        var joinDto = JoinRequestDTO.builder()
+                .email(this.mockEmail)
+                .password("password123!")
+                .username("User One")
+                .nickname("user-one")
+                .phone("010-1234-5678")
+                .build();
+
+        given(this.userRepository.existsByUserEmail(this.mockEmail))
+                .willReturn(false);
+        given(this.passwordEncoder.encode(joinDto.getPassword()))
+                .willReturn("encodedPassword");
+        given(this.userRepository.save(any(Users.class)))
+                .willAnswer(invocation -> invocation.getArgument(0));
+
+        var userRespDTO = this.authService.join(joinDto);
+        assertThat(userRespDTO).isNotNull();
+        assertThat(userRespDTO.getUserEmail()).isEqualTo(this.mockEmail);
     }
 }
