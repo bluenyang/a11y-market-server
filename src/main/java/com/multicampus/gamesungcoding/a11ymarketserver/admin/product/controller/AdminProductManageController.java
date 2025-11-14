@@ -37,6 +37,6 @@ public class AdminProductManageController {
 
         log.info("AdminUserManageController - changeProductStatus");
         this.service.changeProductStatus(UUID.fromString(productId), status);
-        return ResponseEntity.ok("Change product status functionality is under development.");
+        return ResponseEntity.ok("SUCCESS");
     }
 }

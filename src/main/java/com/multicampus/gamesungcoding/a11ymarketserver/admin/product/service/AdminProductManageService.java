@@ -20,7 +20,8 @@ public class AdminProductManageService {
         log.info("inquirePendingProducts - called");
         var list = this.productRepository.findAll(
                 (root, query, criteriaBuilder) ->
-                        criteriaBuilder.equal(root.get("product_status"), "PENDING")
+                        // !! column 이름이 아니라 entity 필드 이름으로 작성히야 함 !!
+                        criteriaBuilder.equal(root.get("productStatus"), "PENDING")
 
         );
 
