@@ -9,7 +9,6 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequ
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinResponseDTO;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +22,14 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/auth")
+@RequestMapping("/api")
 public class AuthController {
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
 
-    @PostMapping("/v1/login")
+    @PostMapping("/v1/auth/login")
     public ResponseEntity<JwtResponse> login(@RequestBody LoginDTO dto/*, HttpSession session*/) {
         // var user = authService.login(dto);
         // // 로그인 성공
@@ -58,20 +57,22 @@ public class AuthController {
                         .build());
     }
 
-    @PostMapping("/v1/logout")
+    @PostMapping("/v1/auth/logout")
     @ResponseBody
-    public String logout(HttpSession session) {
-        session.invalidate(); // 세션 무효화
-        return "로그아웃 성공";
+    public ResponseEntity<String> logout(Authentication authentication) {
+        String userEmail = authentication.getName();
+
+        authService.logout(userEmail);
+        return ResponseEntity.ok("로그아웃 성공");
     }
 
-    @PostMapping("/v1/refresh")
+    @PostMapping("/v1/auth/refresh")
     public ResponseEntity<JwtResponse> refreshToken(@RequestBody RefreshRequest refreshRequest) {
         var resp = authService.reissueToken(refreshRequest.refreshToken());
         return ResponseEntity.ok(resp);
     }
 
-    @PostMapping("/v1/join")
+    @PostMapping("/v1/auth/join")
     public ResponseEntity<?> join(@RequestBody @Valid JoinRequestDTO dto) {
 
         var savedUser = authService.join(dto);

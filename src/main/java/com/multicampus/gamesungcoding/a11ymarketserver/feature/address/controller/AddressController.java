@@ -17,13 +17,13 @@ import java.util.UUID;
 @Validated
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/users/me")
+@RequestMapping("/api")
 public class AddressController {
 
     private final AddressService addressService;
 
     // 배송지 목록 조회
-    @GetMapping("/v1/address")
+    @GetMapping("/v1/users/me/address")
     public ResponseEntity<List<AddressResponse>> getAddressList(
             HttpSession session
             //@RequestParam String uuid
@@ -35,7 +35,7 @@ public class AddressController {
     }
 
     // 배송지 등록
-    @PostMapping("/v1/address")
+    @PostMapping("/v1/users/me/address")
     public ResponseEntity<AddressResponse> insertAddress(
             HttpSession session,
             @Valid @RequestBody AddressRequest request) {
@@ -45,7 +45,7 @@ public class AddressController {
     }
 
     // 배송지 정보 수정
-    @PutMapping("/v1/address/{addressId}")
+    @PutMapping("/v1/users/me/address/{addressId}")
     public ResponseEntity<AddressResponse> updateAddress(
             HttpSession session,
             @PathVariable UUID addressId,
@@ -56,7 +56,7 @@ public class AddressController {
     }
 
     // 배송지 삭제
-    @DeleteMapping("/v1/address/{addressId}")
+    @DeleteMapping("/v1/users/me/address/{addressId}")
     public ResponseEntity<Void> deleteAddress(
             HttpSession session,
             @PathVariable UUID addressId) {
@@ -66,7 +66,7 @@ public class AddressController {
     }
 
     // 기본 배송지 조회
-    @GetMapping("/v1/default-address")
+    @GetMapping("/v1/users/me/default-address")
     public ResponseEntity<AddressResponse> getDefaultAddress(
             HttpSession session) {
         UUID userId = (UUID) session.getAttribute("userId");
@@ -78,7 +78,7 @@ public class AddressController {
     }
 
     // 기본 배송지 변경
-    @PatchMapping("/v1/default-address")
+    @PatchMapping("/v1/users/me/default-address")
     public ResponseEntity<AddressResponse> updateDefaultAddress(
             HttpSession session,
             @Valid @RequestBody AddressRequest request) {
