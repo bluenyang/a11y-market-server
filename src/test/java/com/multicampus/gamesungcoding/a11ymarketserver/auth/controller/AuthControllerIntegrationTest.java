@@ -14,6 +14,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -49,6 +50,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("로그인 API 통합 테스트 - 성공 케이스")
     void testLoginIntegration() throws Exception {
         var loginReq = LoginDTO.builder()
@@ -60,8 +62,8 @@ class AuthControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginReq)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userEmail").value("user1@example.com"))
-                .andExpect(jsonPath("$.userName").value("User One"));
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.refreshToken").isNotEmpty());
     }
 
     @Test
@@ -75,10 +77,11 @@ class AuthControllerIntegrationTest {
         this.mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginReq)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
+    @WithMockUser(username = "user1@example.com", password = "password123!")
     @DisplayName("로그아웃 API 통합 테스트")
     void testLogoutIntegration() throws Exception {
         this.mockMvc.perform(post("/api/v1/auth/logout"))
@@ -87,6 +90,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("회원가입 API 통합 테스트 - 성공 케이스")
     void testJoinIntegration() throws Exception {
         var joinReq = JoinRequestDTO.builder()
@@ -107,6 +111,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("회원가입 API 통합 테스트 - 이메일 중복 케이스")
     void testJoinIntegration_DuplicateEmail() throws Exception {
         var joinReq = JoinRequestDTO.builder()
@@ -125,6 +130,7 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("회원가입 API 통합 테스트 - 유효성 검사 실패 케이스")
     void testJoinIntegration_ValidationFailure() throws Exception {
         var joinReq = JoinRequestDTO.builder()

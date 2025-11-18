@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -60,6 +61,7 @@ class ProductManageControllerIntTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("등록 대기 상품 조회 통합 테스트")
     void testInquirePendingProducts() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -68,6 +70,7 @@ class ProductManageControllerIntTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("상품 상태 변경 통합 테스트 - 승인")
     void testChangeProductStatusApprove() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -83,6 +86,7 @@ class ProductManageControllerIntTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("상품 상태 변경 통합 테스트 - 거부")
     void testChangeProductStatusReject() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders

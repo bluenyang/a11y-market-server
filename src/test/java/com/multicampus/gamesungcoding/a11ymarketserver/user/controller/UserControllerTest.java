@@ -1,6 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.user.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.controller.UserController;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.UserResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.service.UserService;
@@ -14,22 +15,23 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.mockito.BDDMockito.given;
 
 @Import(SecurityConfig.class)
 @WebMvcTest(UserController.class)
 class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;
-
+    @MockitoBean
+    private JwtTokenProvider jwtTokenProvider;
     @MockitoBean
     private UserService userService;
 
-    @WithMockUser
     @Test
+    @WithMockUser
     void testGetUserEndpoint() throws Exception {
         String mockUserId = "019A698A-43EA-7785-87A6-4BA7E9E58784";
         String mockEmail = "user1@example.com";

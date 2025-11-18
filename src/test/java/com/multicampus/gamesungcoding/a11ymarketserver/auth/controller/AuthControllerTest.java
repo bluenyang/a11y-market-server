@@ -1,12 +1,14 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.service.RefreshTokenService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.controller.AuthController;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequestDTO;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.UserRespDTO;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
-import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -14,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,14 +33,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;
-
     @MockitoBean
     private AuthService authService;
+    @MockitoBean
+    private JwtTokenProvider jwtTokenProvider;
+    @MockitoBean
+    private RefreshTokenService refreshTokenService;
+    @MockitoBean
+    private AuthenticationManager authenticationManager;
 
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final UUID mockUserId = UUID.randomUUID();
     private final String mockName = "User One";
 
     @Test
@@ -48,26 +56,23 @@ class AuthControllerTest {
                 .email(mockEmail)
                 .password(mockPassword)
                 .build();
-        var mockResp = UserRespDTO.builder()
-                .userId(this.mockUserId)
-                .userEmail(mockEmail)
-                .userName(this.mockName)
-                .build();
 
-        BDDMockito.given(this.authService.login(any(LoginDTO.class)))
-                .willReturn(mockResp);
+        BDDMockito.given(this.jwtTokenProvider.createAccessToken(any()))
+                .willReturn("mockAccessToken");
+        BDDMockito.given(this.refreshTokenService.createRefreshToken(any()))
+                .willReturn("mockRefreshToken");
 
         this.mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(this.objectMapper.writeValueAsString(mockReqDto))
                 )
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(this.mockUserId.toString()))
-                .andExpect(jsonPath("$.userEmail").value(mockEmail))
-                .andExpect(jsonPath("$.userName").value(this.mockName));
+                .andExpect(jsonPath("$.accessToken").exists())
+                .andExpect(jsonPath("$.refreshToken").exists());
     }
 
     @Test
+    @WithMockUser
     @DisplayName("로그아웃 성공 테스트")
     void testLogout() throws Exception {
         this.mockMvc.perform(post("/api/v1/auth/logout"))

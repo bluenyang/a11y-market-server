@@ -2,6 +2,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.admin.product.controller
 
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.product.service.AdminProductManageService;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,6 +10,7 @@ import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -24,6 +26,8 @@ class ProductManageControllerTest {
     @Autowired
     private MockMvc mockMvc;
     @MockitoBean
+    private JwtTokenProvider jwtTokenProvider;
+    @MockitoBean
     private AdminProductManageService service;
 
     @BeforeEach
@@ -32,6 +36,7 @@ class ProductManageControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("등록 대기 상품 조회 테스트")
     void testInquirePendingProducts() throws Exception {
         BDDMockito.given(this.service.inquirePendingProducts()).willReturn(List.of());
@@ -41,6 +46,7 @@ class ProductManageControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("상품 상태 변경 테스트")
     void testChangeProductStatus() throws Exception {
         String mockProductId = "123e4567-e89b-12d3-a456-426614174000";
