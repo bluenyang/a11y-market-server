@@ -71,6 +71,7 @@ public class SecurityConfig {
                                 "/api/*/auth/join",
                                 "/api/*/auth/refresh",
                                 "/api/*/auth/oauth2/code/kakao",
+                                "/api/*/products",
                                 "/connection/test")
                         .permitAll()
                         .anyRequest()

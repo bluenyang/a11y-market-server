@@ -6,17 +6,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.UUID;
-
 @Getter
 @Setter
 @NoArgsConstructor
 public class CartAddRequest {
     @NotNull
-    private UUID userId;
-
-    @NotNull
-    private UUID productId;
+    private String productId;
 
     @NotNull
     @Min(1)
