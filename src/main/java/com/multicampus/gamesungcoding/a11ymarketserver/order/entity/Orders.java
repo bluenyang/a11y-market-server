@@ -1,10 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.order.entity;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.config.id.UuidV7;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -54,11 +51,17 @@ public class Orders {
     @Column(nullable = false)
     private Long totalPrice;
 
+    @Enumerated(EnumType.STRING)
     @Column(length = 30, nullable = false)
-    private String orderStatus;
+    private OrderStatus orderStatus;
 
     @CreationTimestamp
     @Column(updatable = false)
     private LocalDateTime createdAt;
+
+
+    public void updateTotalPrice(Long totalPrice) {
+        this.totalPrice = totalPrice;
+    }
 
 }
