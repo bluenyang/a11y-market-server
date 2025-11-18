@@ -15,7 +15,6 @@ import java.util.UUID;
 public class Cart {
     @Id
     @UuidV7
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(length = 16, updatable = false, nullable = false)
     private UUID cartId;
 

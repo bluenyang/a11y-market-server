@@ -12,9 +12,7 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 public class Addresses {
     @Id
@@ -47,6 +45,24 @@ public class Addresses {
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @Builder
+    public Addresses(UUID userId,
+                     String addressName,
+                     String receiverName,
+                     String receiverPhone,
+                     String receiverZipcode,
+                     String receiverAddr1,
+                     String receiverAddr2) {
+
+        this.userId = userId;
+        this.addressName = addressName;
+        this.receiverName = receiverName;
+        this.receiverPhone = receiverPhone;
+        this.receiverZipcode = receiverZipcode;
+        this.receiverAddr1 = receiverAddr1;
+        this.receiverAddr2 = receiverAddr2;
+    }
 
     // 배송지 정보 수정
     public void updateAddrInfo(
