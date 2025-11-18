@@ -1,7 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.product.service;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.product.model.Product;
-import com.multicampus.gamesungcoding.a11ymarketserver.product.repository.ProductRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.Product;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

@@ -1,7 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.product.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.product.service.AdminProductManageService;
-import com.multicampus.gamesungcoding.a11ymarketserver.config.SecurityConfig;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

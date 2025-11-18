@@ -1,7 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.user.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.user.service.AdminUserManageService;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.model.UserAdminDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.UserAdminDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

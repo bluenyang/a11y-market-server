@@ -1,11 +1,12 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.JoinRequestDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.LoginDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.UserRespDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.auth.service.AuthService;
-import com.multicampus.gamesungcoding.a11ymarketserver.config.SecurityConfig;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.controller.AuthController;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequestDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.UserRespDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;

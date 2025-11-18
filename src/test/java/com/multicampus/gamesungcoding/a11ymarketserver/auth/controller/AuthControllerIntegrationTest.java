@@ -1,9 +1,10 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.auth.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.LoginDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.model.Users;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.repository.UserRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequestDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -88,7 +89,7 @@ class AuthControllerIntegrationTest {
     @Test
     @DisplayName("회원가입 API 통합 테스트 - 성공 케이스")
     void testJoinIntegration() throws Exception {
-        var joinReq = com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.JoinRequestDTO.builder()
+        var joinReq = JoinRequestDTO.builder()
                 .email("user2@example.com")
                 .password("Password123!")
                 .nickname("User Two")
@@ -108,7 +109,7 @@ class AuthControllerIntegrationTest {
     @Test
     @DisplayName("회원가입 API 통합 테스트 - 이메일 중복 케이스")
     void testJoinIntegration_DuplicateEmail() throws Exception {
-        var joinReq = com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.JoinRequestDTO.builder()
+        var joinReq = JoinRequestDTO.builder()
                 .email("user1@example.com") // 이미 존재하는 이메일
                 .password("Password123!")
                 .nickname("User One Duplicate")
@@ -126,7 +127,7 @@ class AuthControllerIntegrationTest {
     @Test
     @DisplayName("회원가입 API 통합 테스트 - 유효성 검사 실패 케이스")
     void testJoinIntegration_ValidationFailure() throws Exception {
-        var joinReq = com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.JoinRequestDTO.builder()
+        var joinReq = JoinRequestDTO.builder()
                 .email("invalid-email-format") // 잘못된 이메일 형식
                 .password("short") // 너무 짧은 비밀번호
                 .nickname("") // 빈 닉네임

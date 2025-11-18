@@ -1,7 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.product.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.product.service.AdminProductManageService;
-import com.multicampus.gamesungcoding.a11ymarketserver.product.model.ProductDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;

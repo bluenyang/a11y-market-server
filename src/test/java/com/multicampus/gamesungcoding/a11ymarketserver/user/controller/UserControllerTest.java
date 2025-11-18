@@ -1,8 +1,9 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.user.controller;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.config.SecurityConfig;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.model.UserResponse;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.service.UserService;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.controller.UserController;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.UserResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;

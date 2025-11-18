@@ -1,7 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.user.service;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.user.model.Users;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.repository.UserRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
