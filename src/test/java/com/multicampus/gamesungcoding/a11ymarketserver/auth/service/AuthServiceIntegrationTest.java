@@ -1,18 +1,21 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.auth.service;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.LoginDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.model.Users;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.repository.UserRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -48,10 +51,10 @@ class AuthServiceIntegrationTest {
                 .password("password123!")
                 .build();
 
-        var userRespDTO = this.authService.login(loginDto);
+        var userResponse = this.authService.login(loginDto);
 
-        assertThat(userRespDTO).isNotNull();
-        assertThat(userRespDTO.getUserEmail()).isEqualTo("user1@example.com");
+        assertThat(userResponse).isNotNull();
+        assertThat(userResponse.userEmail()).isEqualTo("user1@example.com");
     }
 
     @Test
@@ -62,8 +65,9 @@ class AuthServiceIntegrationTest {
                 .password("wrongpassword")
                 .build();
 
-        var userRespDTO = this.authService.login(loginDto);
+        assertThatThrownBy(() ->
+                this.authService.login(loginDto)
+        ).isInstanceOf(BadCredentialsException.class);
 
-        assertThat(userRespDTO).isNull();
     }
 }

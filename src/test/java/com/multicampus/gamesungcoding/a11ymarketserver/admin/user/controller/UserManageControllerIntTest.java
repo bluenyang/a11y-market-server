@@ -1,7 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.user.controller;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.user.model.Users;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.repository.UserRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -60,6 +61,7 @@ class UserManageControllerIntTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("사용자 관리 API 통합 테스트 - 사용자 목록 조회")
     void testGetUserList() throws Exception {
         this.mockMvc.perform(get("/api/v1/admin/users")
@@ -69,6 +71,7 @@ class UserManageControllerIntTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("사용자 관리 API 통합 테스트 - 특정 사용자 권한 변경")
     void testChangeUserRole() throws Exception {
         // 변경 시도

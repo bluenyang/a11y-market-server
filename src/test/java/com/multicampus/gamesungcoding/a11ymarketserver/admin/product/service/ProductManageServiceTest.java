@@ -1,7 +1,8 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.product.service;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.product.model.Product;
-import com.multicampus.gamesungcoding.a11ymarketserver.product.repository.ProductRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.Product;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductStatus;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -41,7 +42,7 @@ class ProductManageServiceTest {
                 .productName("Product One")
                 .productDescription("Product One")
                 .productAiSummary("Product One")
-                .productStatus("PENDING")
+                .productStatus(ProductStatus.PENDING)
                 .build();
         this.mockProduct2 = Product.builder()
                 .sellerId(UUID.randomUUID())
@@ -51,7 +52,7 @@ class ProductManageServiceTest {
                 .productName("Product Two")
                 .productDescription("Product Two")
                 .productAiSummary("Product Two")
-                .productStatus("PENDING")
+                .productStatus(ProductStatus.PENDING)
                 .build();
     }
 
@@ -74,7 +75,7 @@ class ProductManageServiceTest {
     @Test
     @DisplayName("상품 상태 변경 테스트")
     void testChangeProductStatus() {
-        String newStatus = "APPROVED";
+        var newStatus = ProductStatus.APPROVED;
         BDDMockito.given(this.repository.findById(this.mockPrdId1))
                 .willReturn(java.util.Optional.of(this.mockProduct1));
 

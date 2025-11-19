@@ -1,9 +1,11 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.auth.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.LoginDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.model.Users;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.repository.UserRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequestDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,8 +15,12 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -34,6 +40,11 @@ class AuthControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
+    private final LoginDTO mockLoginReq = LoginDTO.builder()
+            .email("user1@example.com")
+            .password("password123!")
+            .build();
+
     @BeforeEach
     void setup() {
         Users testUser = Users.builder()
@@ -48,19 +59,15 @@ class AuthControllerIntegrationTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("로그인 API 통합 테스트 - 성공 케이스")
     void testLoginIntegration() throws Exception {
-        var loginReq = LoginDTO.builder()
-                .email("user1@example.com")
-                .password("password123!")
-                .build();
-
         this.mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginReq)))
+                        .content(objectMapper.writeValueAsString(this.mockLoginReq)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userEmail").value("user1@example.com"))
-                .andExpect(jsonPath("$.userName").value("User One"));
+                .andExpect(jsonPath("$.accessToken").isNotEmpty())
+                .andExpect(jsonPath("$.refreshToken").isNotEmpty());
     }
 
     @Test
@@ -74,13 +81,26 @@ class AuthControllerIntegrationTest {
         this.mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginReq)))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
-    @DisplayName("로그아웃 API 통합 테스트")
+    @DisplayName("로그아웃 API 통합 테스트 - 실제 accessToken 발급 후 로그아웃")
     void testLogoutIntegration() throws Exception {
-        this.mockMvc.perform(post("/api/v1/auth/logout"))
+        MvcResult loginResult = this.mockMvc.perform(post("/api/v1/auth/login")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(this.mockLoginReq)))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        String responseBody = loginResult.getResponse().getContentAsString();
+        Map<String, Object> responseMap = objectMapper.readValue(
+                responseBody, new TypeReference<>() {
+                });
+        String accessToken = (String) responseMap.get("accessToken");
+
+        this.mockMvc.perform(post("/api/v1/auth/logout")
+                        .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").value("로그아웃 성공"));
     }
@@ -88,7 +108,7 @@ class AuthControllerIntegrationTest {
     @Test
     @DisplayName("회원가입 API 통합 테스트 - 성공 케이스")
     void testJoinIntegration() throws Exception {
-        var joinReq = com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.JoinRequestDTO.builder()
+        var joinReq = JoinRequestDTO.builder()
                 .email("user2@example.com")
                 .password("Password123!")
                 .nickname("User Two")
@@ -100,15 +120,14 @@ class AuthControllerIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(joinReq)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.user.userEmail").value("user2@example.com"))
-                .andExpect(jsonPath("$.user.userName").value("User Two"))
-                .andExpect(jsonPath("$.msg").value("회원가입 성공"));
+                .andExpect(jsonPath("$.userEmail").value("user2@example.com"))
+                .andExpect(jsonPath("$.userName").value("User Two"));
     }
 
     @Test
     @DisplayName("회원가입 API 통합 테스트 - 이메일 중복 케이스")
     void testJoinIntegration_DuplicateEmail() throws Exception {
-        var joinReq = com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.JoinRequestDTO.builder()
+        var joinReq = JoinRequestDTO.builder()
                 .email("user1@example.com") // 이미 존재하는 이메일
                 .password("Password123!")
                 .nickname("User One Duplicate")
@@ -119,14 +138,14 @@ class AuthControllerIntegrationTest {
         this.mockMvc.perform(post("/api/v1/auth/join")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(joinReq)))
-                .andExpect(status().isConflict())
-                .andExpect(jsonPath("$.message").value("이미 존재하는 이메일입니다."));
+                .andExpect(status().isConflict());
     }
 
     @Test
+    @WithMockUser
     @DisplayName("회원가입 API 통합 테스트 - 유효성 검사 실패 케이스")
     void testJoinIntegration_ValidationFailure() throws Exception {
-        var joinReq = com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.JoinRequestDTO.builder()
+        var joinReq = JoinRequestDTO.builder()
                 .email("invalid-email-format") // 잘못된 이메일 형식
                 .password("short") // 너무 짧은 비밀번호
                 .nickname("") // 빈 닉네임

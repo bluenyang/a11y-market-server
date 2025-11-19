@@ -173,7 +173,7 @@ jobs:
         with:
           script: |
             const domain = "${{ secrets.QA_DOMAIN }}"
-            const message = "🚀 테스트/QA 서버가 배포되었습니다.";
+            const message = `🚀 테스트/QA 서버가 배포되었습니다.\n\nurl: [Preview](https://be-pr-${{ env.PR_NUMBER }}.${domain})`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,

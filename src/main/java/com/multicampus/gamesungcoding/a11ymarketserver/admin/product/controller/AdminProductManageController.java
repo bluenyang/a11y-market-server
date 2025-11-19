@@ -1,7 +1,8 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.product.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.product.service.AdminProductManageService;
-import com.multicampus.gamesungcoding.a11ymarketserver.product.model.ProductDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,7 @@ public class AdminProductManageController {
     // 관리자 - 상품 상태 변경 (미구현)
     @PatchMapping("/v1/admin/products/{productId}/status")
     public ResponseEntity<String> changeProductStatus(@PathVariable String productId,
-                                                      @RequestParam String status) {
+                                                      @RequestParam ProductStatus status) {
 
         log.info("AdminUserManageController - changeProductStatus");
         this.service.changeProductStatus(UUID.fromString(productId), status);

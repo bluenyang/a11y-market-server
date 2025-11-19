@@ -1,9 +1,12 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.auth.service;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.JoinRequestDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.auth.dto.LoginDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.model.Users;
-import com.multicampus.gamesungcoding.a11ymarketserver.user.repository.UserRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.service.RefreshTokenService;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequestDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,12 +14,19 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
@@ -30,6 +40,12 @@ class AuthServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+    @Mock
+    private RefreshTokenService refreshTokenService;
+    @Mock
+    private JwtTokenProvider jwtTokenProvider;
+    @Mock
+    private AuthenticationManager authenticationManager;
 
     private final UUID mockUserId = UUID.randomUUID();
     private final String mockEmail = "user1@example.com";
@@ -59,14 +75,31 @@ class AuthServiceTest {
 
         given(this.userRepository.findByUserEmail(this.mockEmail))
                 .willReturn(Optional.of(this.mockUser));
-        given(this.passwordEncoder.matches(loginDto.getPassword(), this.mockUser.getUserPass()))
-                .willReturn(true);
+
+        UserDetails mockUserDetails =
+                User.withUsername(this.mockEmail)
+                        .password("Password123!")
+                        .roles("USER")
+                        .build();
+        Authentication mockAuth =
+                new UsernamePasswordAuthenticationToken(
+                        "user1@exampmle.com",
+                        "Password123!",
+                        mockUserDetails.getAuthorities()
+                );
+
+        given(this.authenticationManager.authenticate(any()))
+                .willReturn(mockAuth);
+        given(this.jwtTokenProvider.createAccessToken(any()))
+                .willReturn("mockAccessToken");
+        given(this.refreshTokenService.createRefreshToken(any()))
+                .willReturn("mockRefreshToken");
 
         var userRespDTO = this.authService.login(loginDto);
 
         assertThat(userRespDTO).isNotNull();
-        assertThat(userRespDTO.getUserEmail()).isEqualTo(this.mockEmail);
-        assertThat(userRespDTO.getUserId()).isEqualTo(this.mockUserId);
+        assertThat(userRespDTO.userEmail()).isEqualTo(this.mockEmail);
+        assertThat(userRespDTO.userRole()).isEqualTo("USER");
     }
 
     @Test
@@ -79,9 +112,12 @@ class AuthServiceTest {
 
         given(this.userRepository.findByUserEmail(this.mockEmail))
                 .willReturn(Optional.of(this.mockUser));
+        given(this.authenticationManager.authenticate(any()))
+                .willThrow(BadCredentialsException.class);
 
-        assertThat(this.authService.login(loginDto))
-                .isNull();
+        assertThatThrownBy(() ->
+                this.authService.login(loginDto)
+        ).isInstanceOf(BadCredentialsException.class);
     }
 
     @Test

@@ -1,7 +1,8 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.product.service;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.product.model.Product;
-import com.multicampus.gamesungcoding.a11ymarketserver.product.repository.ProductRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.Product;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductStatus;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -36,7 +37,7 @@ class ProductManageServiceIntTest {
                 .productName("Product One")
                 .productDescription("Product One")
                 .productAiSummary("Product One")
-                .productStatus("PENDING")
+                .productStatus(ProductStatus.PENDING)
                 .build();
         this.mockProduct2 = Product.builder()
                 .sellerId(UUID.randomUUID())
@@ -46,7 +47,7 @@ class ProductManageServiceIntTest {
                 .productName("Product Two")
                 .productDescription("Product Two")
                 .productAiSummary("Product Two")
-                .productStatus("PENDING")
+                .productStatus(ProductStatus.PENDING)
                 .build();
         this.repository.save(this.mockProduct1);
         this.repository.save(this.mockProduct2);
@@ -68,14 +69,14 @@ class ProductManageServiceIntTest {
     void testApproveProduct() {
         this.service.changeProductStatus(
                 this.mockProduct1.getProductId(),
-                "APPROVED"
+                ProductStatus.APPROVED
         );
 
         var updatedProduct = this.repository.findById(this.mockProduct1.getProductId())
                 .orElse(null);
         assertThat(updatedProduct).isNotNull();
         assertThat(updatedProduct.getProductStatus())
-                .isEqualTo("APPROVED");
+                .isEqualTo(ProductStatus.APPROVED);
     }
 
     @Test
@@ -83,13 +84,13 @@ class ProductManageServiceIntTest {
     void testRejectProduct() {
         this.service.changeProductStatus(
                 this.mockProduct2.getProductId(),
-                "REJECTED"
+                ProductStatus.REJECTED
         );
 
         var updatedProduct = this.repository.findById(this.mockProduct2.getProductId())
                 .orElse(null);
         assertThat(updatedProduct).isNotNull();
         assertThat(updatedProduct.getProductStatus())
-                .isEqualTo("REJECTED");
+                .isEqualTo(ProductStatus.REJECTED);
     }
 }

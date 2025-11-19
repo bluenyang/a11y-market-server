@@ -1,13 +1,15 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.user.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.user.service.AdminUserManageService;
-import com.multicampus.gamesungcoding.a11ymarketserver.config.SecurityConfig;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -25,11 +27,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class UserManageControllerTest {
     @Autowired
     private MockMvc mockMvc;
-
+    @MockitoBean
+    private JwtTokenProvider jwtTokenProvider;
     @MockitoBean
     private AdminUserManageService service;
 
     @Test
+    @WithMockUser
     @DisplayName("전체 사용자 조회 테스트")
     void testInquireUsers() throws Exception {
         this.mockMvc.perform(get("/api/v1/admin/users"))
@@ -37,6 +41,7 @@ class UserManageControllerTest {
     }
 
     @Test
+    @WithMockUser
     @DisplayName("사용자 권한 변경 테스트")
     void testChangeUserPermission() throws Exception {
         UUID mockUserId = UUID.randomUUID();

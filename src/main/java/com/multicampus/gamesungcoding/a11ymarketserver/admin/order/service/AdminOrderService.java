@@ -1,7 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.order.service;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.order.model.AdminOrderRespDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.admin.order.repository.AdminOrderRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrdersRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class AdminOrderService {
 
-    private final AdminOrderRepository ordersRepository;
+    private final OrdersRepository ordersRepository;
 
     public List<AdminOrderRespDTO> getAllOrders() {
         return ordersRepository.findAll()

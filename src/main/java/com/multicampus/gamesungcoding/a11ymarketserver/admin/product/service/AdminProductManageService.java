@@ -1,7 +1,8 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.product.service;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.product.model.ProductDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.product.repository.ProductRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductStatus;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,7 +39,7 @@ public class AdminProductManageService {
 
     // 관리자 - 상품 상태 변경 (미구현)
     @Transactional
-    public void changeProductStatus(UUID productId, String status) {
+    public void changeProductStatus(UUID productId, ProductStatus status) {
         log.info("changeProductStatus - called");
 
         var user = productRepository.findById(productId)
