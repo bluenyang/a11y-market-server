@@ -7,8 +7,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,10 +23,10 @@ public class UserController {
     // 회원 정보 조회
     @GetMapping("/v1/users/me")
     public ResponseEntity<UserResponse> getUserInfo(
-            @AuthenticationPrincipal Authentication authentication
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
         log.info("UserController getUserInfo");
-        UserResponse response = userService.getUserInfo(authentication.getName());
+        UserResponse response = userService.getUserInfo(userDetails.getUsername());
 
         log.info("User found: {}", response.getUserEmail());
         return ResponseEntity.ok(response);
@@ -35,12 +35,12 @@ public class UserController {
     // 회원 정보 수정
     @PatchMapping("/v1/users/me")
     public ResponseEntity<UserResponse> updateUserInfo(
-            @AuthenticationPrincipal Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             //@RequestParam String uuid,
             @Valid @RequestBody UserUpdateRequest request) {
 
         log.info("UserController updateUserInfo");
-        UserResponse response = userService.updateUserInfo(authentication.getName(), request);
+        UserResponse response = userService.updateUserInfo(userDetails.getUsername(), request);
 
         log.info("User updated: {}", response.getUserEmail());
         return ResponseEntity.ok(response);

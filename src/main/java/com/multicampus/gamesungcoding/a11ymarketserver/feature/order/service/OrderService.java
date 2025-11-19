@@ -5,6 +5,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidR
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.UserNotFoundException;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.Addresses;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.repository.AddressRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.Cart;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.CartItems;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.repository.CartItemRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.repository.CartRepository;
@@ -123,13 +124,19 @@ public class OrderService {
             throw new InvalidRequestException("일부 장바구니 상품을 찾을 수 없습니다.");
         }
 
+        var cartList = cartRepository.findAllById(
+                // CartItemId로 각 Item를 추가한 Cart 조회
+                cartItems.stream()
+                        .map(CartItems::getCartId)
+                        .toList()
+        );
+
         // 소유자 검증
         var emailList =
                 // Id
                 userRepository.findAllById(
-                                // CartItemId로 각 Item를 추가한 User 조회
-                                cartItems.stream()
-                                        .map(CartItems::getCartId)
+                                cartList.stream()
+                                        .map(Cart::getUserId)
                                         .toList()
                         )
                         .stream()

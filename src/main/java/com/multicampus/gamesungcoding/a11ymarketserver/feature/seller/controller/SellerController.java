@@ -9,8 +9,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -30,11 +30,11 @@ public class SellerController {
     @PostMapping("/v1/seller/apply")
     @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<SellerApplyResponse> applySeller(
-            @AuthenticationPrincipal Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody @Valid SellerApplyRequest request) {
 
         SellerApplyResponse response =
-                sellerService.applySeller(authentication.getName(), request);
+                sellerService.applySeller(userDetails.getUsername(), request);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -45,10 +45,10 @@ public class SellerController {
      */
     @PostMapping("/v1/seller/products")
     public ResponseEntity<ProductDTO> registerProduct(
-            @AuthenticationPrincipal Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestBody @Valid SellerProductRegisterRequest request) {
 
-        ProductDTO response = sellerService.registerProduct(authentication.getName(), request);
+        ProductDTO response = sellerService.registerProduct(userDetails.getUsername(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

@@ -8,8 +8,8 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.service.Ord
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -29,20 +29,20 @@ public class OrderController {
     // 결제 준비 (결제 정보 조회)
     @PostMapping("/v1/orders/pre-check")
     public OrderCheckoutResponse preCheck(
-            @AuthenticationPrincipal Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody OrderCheckRequest req
     ) {
 
-        return orderService.getCheckoutInfo(authentication.getName(), req);
+        return orderService.getCheckoutInfo(userDetails.getUsername(), req);
     }
 
     // 주문 생성
     @PostMapping("v1/orders")
     public ResponseEntity<OrderResponse> createOrder(
-            @AuthenticationPrincipal Authentication authentication,
+            @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody OrderCreateRequest req) {
 
-        var orderResp = orderService.createOrder(authentication.getName(), req);
+        var orderResp = orderService.createOrder(userDetails.getUsername(), req);
         return ResponseEntity
                 .created(URI.create("/api/v1/users/me/orders/" + orderResp.orderId()))
                 .body(orderResp);
