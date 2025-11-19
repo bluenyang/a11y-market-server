@@ -1,5 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.repository;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartItemResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.CartItems;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -30,5 +31,46 @@ public interface CartItemRepository extends JpaRepository<CartItems, UUID> {
             """)
     List<CartItems> findByUserEmail(@Param("email") String userEmail);
 
+    @Query("""
+            SELECT new com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartItemResponse(
+                ci.cartItemId,
+                ci.cartId,
+                ci.productId,
+                p.productName,
+                p.productPrice,
+                cat.categoryName,
+                ci.quantity
+            )
+            FROM CartItems ci
+                        JOIN Product p ON ci.productId = p.productId
+                        JOIN Categories cat ON p.categoryId = cat.categoryId
+            WHERE ci.cartId = (
+                SELECT c.cartId
+                FROM Cart c
+                WHERE c.userId = (
+                    SELECT u.userId
+                    FROM Users u
+                    WHERE u.userEmail = :email
+                )
+            )
+            """)
+    List<CartItemResponse> findAllByUserEmailToResponse(@Param("email") String userEmail);
 
+
+    @Query("""
+            SELECT new com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartItemResponse(
+                ci.cartItemId,
+                ci.cartId,
+                ci.productId,
+                p.productName,
+                p.productPrice,
+                cat.categoryName,
+                ci.quantity
+            )
+            FROM CartItems ci
+                        JOIN Product p ON ci.productId = p.productId
+                        JOIN Categories cat ON p.categoryId = cat.categoryId
+            WHERE ci.cartItemId = :cartItemId
+            """)
+    List<CartItemResponse> findAllByIdToResponse(@Param("cartItemId") UUID cartItemId);
 }

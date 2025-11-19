@@ -1,6 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.service;
 
 
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartItemUpdatedResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartItemDeleteRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.Cart;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartAddRequest;
@@ -16,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,10 +27,7 @@ public class CartService {
     private final UserRepository userRepository;
 
     public List<CartItemResponse> getCartItems(String UserEmail) {
-        return cartItemRepository.findByCartId(GetCartIdByUserEmail(UserEmail))
-                .stream()
-                .map(CartItemResponse::fromEntity)
-                .collect(Collectors.toList());
+        return cartItemRepository.findAllByUserEmailToResponse(UserEmail);
     }
 
     public int getCartTotal(String userEmail) {
@@ -40,7 +37,7 @@ public class CartService {
     }
 
     @Transactional
-    public CartItemResponse addItem(CartAddRequest req, String userEmail) {
+    public CartItemUpdatedResponse addItem(CartAddRequest req, String userEmail) {
         var cartId = GetCartIdByUserEmail(userEmail);
         CartItems cart = cartItemRepository.findByCartIdAndProductId(cartId, UUID.fromString(req.productId()))
                 .map(existing -> {
@@ -54,11 +51,11 @@ public class CartService {
                         .quantity(req.quantity())
                         .build()
                 );
-        return CartItemResponse.fromEntity(cartItemRepository.save(cart));
+        return CartItemUpdatedResponse.fromEntity(cartItemRepository.save(cart));
     }
 
     @Transactional
-    public CartItemResponse updateQuantity(UUID cartItemId, int quantity, String userEmail) {
+    public CartItemUpdatedResponse updateQuantity(UUID cartItemId, int quantity, String userEmail) {
 
         // 검증: 해당 cartItemId가 userEmail의 장바구니에 속하는지 확인
         UUID cartId = GetCartIdByUserEmail(userEmail);
@@ -72,7 +69,7 @@ public class CartService {
                 .orElseThrow(() -> new NoSuchElementException("Cart item not found: " + cartItemId));
 
         cart.changeQuantity(quantity);
-        return CartItemResponse.fromEntity(cartItemRepository.save(cart));
+        return CartItemUpdatedResponse.fromEntity(cartItemRepository.save(cart));
     }
 
     @Transactional

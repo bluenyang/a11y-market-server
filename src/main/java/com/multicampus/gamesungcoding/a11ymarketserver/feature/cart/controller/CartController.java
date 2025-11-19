@@ -39,7 +39,7 @@ public class CartController {
 
     // POST /api/v1/cart/items 상품 추가 기능
     @PostMapping("/v1/cart/items")
-    public ResponseEntity<CartItemResponse> addItem(
+    public ResponseEntity<CartItemUpdatedResponse> addItem(
             @Valid @RequestBody CartAddRequest req,
             @AuthenticationPrincipal UserDetails userDetails) {
 
@@ -50,7 +50,7 @@ public class CartController {
 
     // PATCH /api/v1/cart/items/{cartItemId} 수량 조정 기능
     @PatchMapping("/v1/cart/items/{cartItemId}")
-    public ResponseEntity<CartItemResponse> updateQuantity(
+    public ResponseEntity<CartItemUpdatedResponse> updateQuantity(
             @PathVariable @NotNull String cartItemId,
             @Valid @RequestBody CartQtyUpdateRequest body,
             @AuthenticationPrincipal UserDetails userDetails) {
