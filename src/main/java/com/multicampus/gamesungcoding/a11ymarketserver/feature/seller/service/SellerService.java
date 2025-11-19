@@ -69,12 +69,12 @@ public class SellerService {
                 .orElseThrow(() -> new IllegalStateException("판매자 정보가 존재하지 않습니다. 먼저 판매자 가입 신청을 완료하세요."));
 
         // 판매자 승인 여부 확인
-        if (!seller.getSellerSubmitStatus().equals(SellerSubmitStatus.PENDING.getStatus())) {
+        if (!seller.getSellerSubmitStatus().equals(SellerSubmitStatus.APPROVED.getStatus())) {
             throw new IllegalStateException("판매자 승인 완료 후 상품 등록이 가능합니다.");
         }
 
         // 2) Product 엔티티 생성
-        UUID sellerId = UUID.fromString(request.sellerId());
+        UUID sellerId = seller.getSellerId();
         UUID categoryId = UUID.fromString(request.categoryId());
 
         Product product = Product.builder()
