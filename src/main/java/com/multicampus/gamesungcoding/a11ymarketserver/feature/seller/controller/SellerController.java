@@ -4,6 +4,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.Pro
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model.SellerApplyRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model.SellerApplyResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model.SellerProductRegisterRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model.SellerProductUpdateRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.service.SellerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 판매자 관련 API 엔드포인트
@@ -64,5 +66,23 @@ public class SellerController {
     ) {
         List<ProductDTO> products = sellerService.getMyProducts(userDetails.getUsername());
         return ResponseEntity.ok(products);
+    }
+
+    /**
+     * 판매자 상품 수정
+     * PUT /api/v1/seller/products/{productId}
+     */
+    @PutMapping("/v1/seller/products/{productId}")
+    public ResponseEntity<ProductDTO> updateProduct(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable UUID productId,
+            @Valid @RequestBody SellerProductUpdateRequest request
+    ) {
+        ProductDTO result = sellerService.updateProduct(
+                userDetails.getUsername(),
+                productId,
+                request
+        );
+        return ResponseEntity.ok(result);
     }
 }

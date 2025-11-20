@@ -67,16 +67,16 @@ public class SellerService {
 
     public ProductDTO registerProduct(String userEmail, SellerProductRegisterRequest request) {
 
-        // 1) userId 로 판매자 조회
+        // userId 로 판매자 조회
         Seller seller = sellerRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new DataNotFoundException("판매자 정보가 존재하지 않습니다. 먼저 판매자 가입 신청을 완료하세요."));
 
-        // 2) 판매자 승인 여부 확인
+        // 판매자 승인 여부 확인
         if (!seller.getSellerSubmitStatus().equals(SellerSubmitStatus.APPROVED.getStatus())) {
             throw new InvalidRequestException("판매자 승인 완료 후 상품 등록이 가능합니다.");
         }
 
-        // 2) Product 엔티티 생성
+        // Product 엔티티 생성
         UUID sellerId = seller.getSellerId();
         UUID categoryId = UUID.fromString(request.categoryId());
 
@@ -91,7 +91,7 @@ public class SellerService {
                 .productStatus(ProductStatus.PENDING)
                 .build();
 
-        // 3) 저장 및 DTO 변환 후 반환
+        // 저장 및 DTO 변환 후 반환
         return ProductDTO.fromEntity(productRepository.save(product));
     }
 
@@ -99,18 +99,57 @@ public class SellerService {
     @Transactional(readOnly = true)
     public List<ProductDTO> getMyProducts(String userEmail) {
 
-        // 1) 이메일로 판매자 찾기
+        // 이메일로 판매자 찾기
         Seller seller = sellerRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new DataNotFoundException("판매자 정보를 찾을 수 없습니다."));
 
         UUID sellerId = seller.getSellerId();
 
-        // 2) 판매자의 상품 목록 조회
+        // 판매자의 상품 목록 조회
         List<Product> products = productRepository.findBySellerId(sellerId);
 
-        // 3) DTO 변환 후 반환
+        // DTO 변환 후 반환
         return products.stream()
                 .map(ProductDTO::fromEntity)
                 .toList();
+    }
+
+    // 상품 수정 요청
+    @Transactional
+    public ProductDTO updateProduct(
+            String userEmail,
+            UUID productId,
+            SellerProductUpdateRequest request
+    ) {
+
+        // 판매자 조회 (없으면 404)
+        Seller seller = sellerRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new DataNotFoundException("판매자 정보를 찾을 수 없습니다."));
+
+        // 승인된 판매자인지 확인 (미승인 → 400)
+        if (!seller.getSellerSubmitStatus().equals(SellerSubmitStatus.APPROVED.getStatus())) {
+            throw new InvalidRequestException("판매자 승인 완료 후 상품을 수정할 수 있습니다.");
+        }
+
+        // 상품 조회 (없으면 404)
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new DataNotFoundException("상품 정보를 찾을 수 없습니다."));
+
+        // 본인 상품인지 확인 (아니면 400)
+        if (!product.getSellerId().equals(seller.getSellerId())) {
+            throw new InvalidRequestException("본인의 상품만 수정할 수 있습니다.");
+        }
+
+        // 실제 수정 적용
+        product.updateBySeller(
+                UUID.fromString(request.categoryId()),
+                request.productName(),
+                request.productDescription(),
+                request.productPrice(),
+                request.productStock()
+        );
+
+        // 저장 후 DTO 반환
+        return ProductDTO.fromEntity(productRepository.save(product));
     }
 }

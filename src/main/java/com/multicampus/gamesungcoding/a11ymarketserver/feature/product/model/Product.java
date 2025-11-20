@@ -130,5 +130,27 @@ public class Product {
     public void changeStatus(ProductStatus newStatus) {
         this.productStatus = newStatus;
     }
+
+    /**
+     * 판매자가 자신의 상품을 수정할 때 사용하는 도메인 메서드
+     * - 카테고리, 상품명, 설명, 가격, 재고 등을 수정
+     * - 수정 시 관리자가 다시 검토해야 하므로 상태를 PENDING 으로 되돌림
+     */
+    public void updateBySeller(
+            UUID categoryId,
+            String productName,
+            String productDescription,
+            Integer productPrice,
+            Integer productStock
+    ) {
+        this.categoryId = categoryId;
+        this.productName = productName;
+        this.productDescription = productDescription;
+        this.productPrice = productPrice;
+        this.productStock = productStock;
+
+        // 상품 수정 시 관리자 승인 필요 → pending 상태로 전환
+        this.productStatus = ProductStatus.PENDING;
+    }
 }
 
