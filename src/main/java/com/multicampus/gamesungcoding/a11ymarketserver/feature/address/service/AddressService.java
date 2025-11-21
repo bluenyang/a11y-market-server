@@ -2,10 +2,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.feature.address.service;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotFoundException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.UserNotFoundException;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.AddressRequest;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.AddressResponse;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.Addresses;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.DefaultAddress;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.*;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.repository.AddressRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.repository.DefaultAddressRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
@@ -41,12 +38,16 @@ public class AddressService {
 
         Addresses address = Addresses.builder()
                 .userId(getUserIdByEmail(userEmail))
-                .addressName(dto.addressName())
-                .receiverName(dto.receiverName())
-                .receiverPhone(dto.receiverPhone())
-                .receiverZipcode(dto.receiverZipcode())
-                .receiverAddr1(dto.receiverAddr1())
-                .receiverAddr2(dto.receiverAddr2())
+                .addressInfo(
+                        AddressInfo.builder()
+                                .addressName(dto.addressName())
+                                .receiverName(dto.receiverName())
+                                .receiverPhone(dto.receiverPhone())
+                                .receiverZipcode(dto.receiverZipcode())
+                                .receiverAddr1(dto.receiverAddr1())
+                                .receiverAddr2(dto.receiverAddr2())
+                                .build()
+                )
                 .build();
 
         return AddressResponse.fromEntity(addressRepository.save(address));
@@ -63,12 +64,14 @@ public class AddressService {
                 .orElseThrow(() -> new DataNotFoundException("Address not found"));
 
         address.updateAddrInfo(
-                dto.addressName(),
-                dto.receiverName(),
-                dto.receiverPhone(),
-                dto.receiverZipcode(),
-                dto.receiverAddr1(),
-                dto.receiverAddr2()
+                AddressInfo.builder()
+                        .addressName(dto.addressName())
+                        .receiverName(dto.receiverName())
+                        .receiverPhone(dto.receiverPhone())
+                        .receiverZipcode(dto.receiverZipcode())
+                        .receiverAddr1(dto.receiverAddr1())
+                        .receiverAddr2(dto.receiverAddr2())
+                        .build()
         );
         return AddressResponse.fromEntity(address);
     }
