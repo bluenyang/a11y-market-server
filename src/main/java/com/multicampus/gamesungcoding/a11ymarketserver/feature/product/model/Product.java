@@ -152,5 +152,13 @@ public class Product {
         // 상품 수정 시 관리자 승인 필요 → pending 상태로 전환
         this.productStatus = ProductStatus.PENDING;
     }
+
+    /**
+     * 판매자가 자신의 상품을 삭제할 때 사용하는 도메인 메서드
+     * - 실제 DB 삭제가 아닌 상태만 DELETED 로 변경
+     */
+    public void deleteBySeller() {
+        this.productStatus = ProductStatus.DELETED;
+    }
 }
 

@@ -85,4 +85,15 @@ public class SellerController {
         );
         return ResponseEntity.ok(result);
     }
+
+    @DeleteMapping("/v1/seller/products/{productId}")
+    public ResponseEntity<Void> deleteProduct(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable UUID productId
+    ) {
+        sellerService.deleteProduct(userDetails.getUsername(), productId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }

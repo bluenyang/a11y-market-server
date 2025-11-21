@@ -5,7 +5,8 @@ import lombok.Getter;
 public enum ProductStatus {
     PENDING("PENDING"),
     APPROVED("APPROVED"),
-    REJECTED("REJECTED");
+    REJECTED("REJECTED"),
+    DELETED("DELETED");
 
     @Getter
     private final String status;
