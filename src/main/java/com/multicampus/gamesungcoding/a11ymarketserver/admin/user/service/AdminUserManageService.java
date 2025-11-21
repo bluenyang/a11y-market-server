@@ -1,16 +1,19 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.user.service;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.UserNotFoundException;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.UserAdminDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.UserResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AdminUserManageService {
     private final UserRepository userRepository;
 
@@ -21,14 +24,14 @@ public class AdminUserManageService {
                 .toList();
     }
 
-    public String changePermission(UUID userId, String role) {
-        AtomicReference<String> response = new AtomicReference<>("FAILURE");
-        userRepository.findById(userId).ifPresent(user -> {
-            user.changeRole(role);
-            userRepository.save(user);
-            response.set("SUCCESS");
-        });
-        return response.get();
+    @Transactional
+    public UserResponse changePermission(UUID userId, String role) {
+
+        var user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + userId));
+
+        user.changeRole(role);
+        return UserResponse.fromEntity(user);
     }
 
 }

@@ -34,18 +34,14 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    // AuthenticationManager
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authCfg) throws Exception {
         return authCfg.getAuthenticationManager();
     }
 
-    // CORS
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         var cfg = new CorsConfiguration();
-
-        // application.yaml 변경됨
         cfg.setAllowedOriginPatterns(corsProperties.getAllowedOriginPatterns());
         cfg.addAllowedHeader("*");
         cfg.addAllowedMethod("*");
@@ -63,8 +59,7 @@ public class SecurityConfig {
                 .formLogin(FormLoginConfigurer::disable)
                 .httpBasic(HttpBasicConfigurer::disable)
                 .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/actuator/health",
@@ -76,11 +71,11 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**",
-                                "/connection/test")
+                                "/connection/test"
+                        )
                         .permitAll()
                         .anyRequest()
-                        .authenticated()
-                )
+                        .authenticated())
                 .addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }

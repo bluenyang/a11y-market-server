@@ -20,9 +20,8 @@ public class AdminOrderManageController {
     // 관리자 - 전체 주문 조회
     @GetMapping("/v1/admin/orders")
     public ResponseEntity<List<AdminOrderResponse>> inquireAllOrders() {
-        log.info("AdminUserManageController - inquireAllOrders");
-
         List<AdminOrderResponse> orders = adminOrderService.getAllOrders();
+        log.info("AdminUserManageController - inquireAllOrders: found {} orders", orders.size());
         return ResponseEntity.ok(orders);
     }
 

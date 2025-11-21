@@ -1,6 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.auth.service;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
@@ -46,10 +46,9 @@ class AuthServiceIntegrationTest {
     @Test
     @DisplayName("로그인 성공 통합 테스트")
     void loginSuccessIntegrationTest() {
-        var loginDto = LoginDTO.builder()
-                .email("user1@example.com")
-                .password("password123!")
-                .build();
+        var loginDto = new LoginRequest(
+                "user1@example.com",
+                "password123!");
 
         var userResponse = this.authService.login(loginDto);
 
@@ -60,10 +59,9 @@ class AuthServiceIntegrationTest {
     @Test
     @DisplayName("로그인 실패 통합 테스트 - 잘못된 비밀번호")
     void loginFailureIntegrationTest_WrongPassword() {
-        var loginDto = LoginDTO.builder()
-                .email("user1@example.com")
-                .password("wrongpassword")
-                .build();
+        var loginDto = new LoginRequest(
+                "user1@example.com",
+                "wrongpassword");
 
         assertThatThrownBy(() ->
                 this.authService.login(loginDto)

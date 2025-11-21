@@ -2,11 +2,13 @@ package com.multicampus.gamesungcoding.a11ymarketserver.admin.order.model;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.Orders;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Slf4j
 public record AdminOrderResponse(
         UUID orderId,
         String userName,
@@ -24,6 +26,7 @@ public record AdminOrderResponse(
         LocalDateTime createdAt) {
 
     public static AdminOrderResponse fromEntity(Orders entity) {
+        log.debug("AdminOrderResponse - fromEntity: Converting Orders entity to AdminOrderResponse DTO");
         return new AdminOrderResponse(
                 entity.getOrderId(),
                 entity.getUserName(),

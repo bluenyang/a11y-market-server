@@ -67,7 +67,7 @@ class UserManageServiceIntTest {
     @DisplayName("사용자 권한 변경 통합 테스트")
     void changeUserRoleIntegrationTest() {
         var result = this.service.changePermission(this.userId1, "ADMIN");
-        assertThat(result).isEqualTo("SUCCESS");
+        assertThat(result.getUserRole()).isEqualTo("ADMIN");
 
         var updatedUser = this.userRepository.findById(this.userId1).orElseThrow();
         assertThat(updatedUser.getUserRole()).isEqualTo("ADMIN");

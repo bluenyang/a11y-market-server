@@ -2,8 +2,8 @@ package com.multicampus.gamesungcoding.a11ymarketserver.auth.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequestDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -40,10 +40,9 @@ class AuthControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    private final LoginDTO mockLoginReq = LoginDTO.builder()
-            .email("user1@example.com")
-            .password("password123!")
-            .build();
+    private final LoginRequest mockLoginReq = new LoginRequest(
+            "user1@example.com",
+            "password123!");
 
     @BeforeEach
     void setup() {
@@ -73,10 +72,9 @@ class AuthControllerIntegrationTest {
     @Test
     @DisplayName("로그인 API 통합 테스트 - 실패 케이스")
     void testLoginIntegration_Failure() throws Exception {
-        var loginReq = LoginDTO.builder()
-                .email("user1@example.com")
-                .password("wrongpassword!")
-                .build();
+        var loginReq = new LoginRequest(
+                "user1@example.com",
+                "wrongpassword!");
 
         this.mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -102,19 +100,18 @@ class AuthControllerIntegrationTest {
         this.mockMvc.perform(post("/api/v1/auth/logout")
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("로그아웃 성공"));
+                .andExpect(jsonPath("$").value("SUCCESS"));
     }
 
     @Test
     @DisplayName("회원가입 API 통합 테스트 - 성공 케이스")
     void testJoinIntegration() throws Exception {
-        var joinReq = JoinRequestDTO.builder()
-                .email("user2@example.com")
-                .password("Password123!")
-                .nickname("User Two")
-                .username("User Two")
-                .phone("01087654321")
-                .build();
+        var joinReq = new JoinRequest(
+                "user2@example.com",
+                "Password123!",
+                "User Two",
+                "User Two",
+                "01087654321");
 
         this.mockMvc.perform(post("/api/v1/auth/join")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -127,13 +124,12 @@ class AuthControllerIntegrationTest {
     @Test
     @DisplayName("회원가입 API 통합 테스트 - 이메일 중복 케이스")
     void testJoinIntegration_DuplicateEmail() throws Exception {
-        var joinReq = JoinRequestDTO.builder()
-                .email("user1@example.com") // 이미 존재하는 이메일
-                .password("Password123!")
-                .nickname("User One Duplicate")
-                .username("User One Duplicate")
-                .phone("01099998888")
-                .build();
+        var joinReq = new JoinRequest(
+                "user1@example.com",
+                "Password123!",
+                "User One Duplicate",
+                "User One Duplicate",
+                "01099998888");
 
         this.mockMvc.perform(post("/api/v1/auth/join")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -145,13 +141,12 @@ class AuthControllerIntegrationTest {
     @WithMockUser
     @DisplayName("회원가입 API 통합 테스트 - 유효성 검사 실패 케이스")
     void testJoinIntegration_ValidationFailure() throws Exception {
-        var joinReq = JoinRequestDTO.builder()
-                .email("invalid-email-format") // 잘못된 이메일 형식
-                .password("short") // 너무 짧은 비밀번호
-                .nickname("") // 빈 닉네임
-                .username("User Invalid")
-                .phone("01012345678")
-                .build();
+        var joinReq = new JoinRequest(
+                "invalid-email-format",
+                "short",
+                "",
+                "User Invalid",
+                "01012345678");
 
         this.mockMvc.perform(post("/api/v1/auth/join")
                         .contentType(MediaType.APPLICATION_JSON)

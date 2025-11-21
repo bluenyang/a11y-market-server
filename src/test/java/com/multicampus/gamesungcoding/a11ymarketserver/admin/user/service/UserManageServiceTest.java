@@ -1,5 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.user.service;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.UserResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -72,9 +73,9 @@ class UserManageServiceTest {
         BDDMockito.given(this.userRepository.findById(this.mockUser1Id))
                 .willReturn(Optional.of(this.mockUser1));
 
-        String result = this.service.changePermission(this.mockUser1Id, newRole);
+        UserResponse result = this.service.changePermission(this.mockUser1Id, newRole);
 
-        assertThat(result).isEqualTo("SUCCESS");
+        assertThat(result.getUserRole()).isEqualTo(newRole);
         assertThat(this.mockUser1.getUserRole()).isEqualTo(newRole);
     }
 }

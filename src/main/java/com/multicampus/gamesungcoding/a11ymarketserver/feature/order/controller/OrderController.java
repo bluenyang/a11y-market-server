@@ -7,6 +7,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.dto.OrderRe
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.service.OrderService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -30,9 +32,8 @@ public class OrderController {
     @PostMapping("/v1/orders/pre-check")
     public OrderCheckoutResponse preCheck(
             @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody OrderCheckRequest req
-    ) {
-
+            @Valid @RequestBody OrderCheckRequest req) {
+        
         return orderService.getCheckoutInfo(userDetails.getUsername(), req);
     }
 

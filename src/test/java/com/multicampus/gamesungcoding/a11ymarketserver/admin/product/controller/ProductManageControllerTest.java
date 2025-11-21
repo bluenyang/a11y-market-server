@@ -43,7 +43,7 @@ class ProductManageControllerTest {
         BDDMockito.given(this.service.inquirePendingProducts()).willReturn(List.of());
 
         this.mockMvc.perform(get("/api/v1/admin/products/pending"))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
     @Test

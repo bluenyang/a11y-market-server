@@ -12,7 +12,7 @@ import org.springframework.context.annotation.Configuration;
 @OpenAPIDefinition(
         info = @Info(
                 title = "A11yMARKET Server API",
-                description = "A11yMARKET Server API 명세서입니다.",
+                description = "A11yMARKET Server API Specification Document",
                 version = "v0.0.1"
         ),
         security = {

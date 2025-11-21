@@ -7,6 +7,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.service.A
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -26,12 +27,10 @@ public class AddressController {
 
     private final AddressService addressService;
 
-    // 배송지 목록 조회
     @GetMapping("/v1/users/me/address")
     public ResponseEntity<List<AddressResponse>> getAddressList(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        log.info("AddressController - getAddressList called");
         return ResponseEntity.ok(
                 addressService.getAddressList(userDetails.getUsername())
         );
@@ -39,6 +38,7 @@ public class AddressController {
 
     // 배송지 등록
     @PostMapping("/v1/users/me/address")
+    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<AddressResponse> insertAddress(
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestBody AddressRequest request) {

@@ -7,8 +7,8 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.UserNotF
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.dto.JwtResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.service.RefreshTokenService;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequestDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.UserResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
@@ -34,13 +34,13 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
 
-    public LoginResponse login(LoginDTO dto) {
+    public LoginResponse login(LoginRequest dto) {
 
-        Users user = userRepository.findByUserEmail(dto.getEmail())
+        Users user = userRepository.findByUserEmail(dto.email())
                 .orElseThrow(() -> new UserNotFoundException("이메일 또는 비밀번호가 올바르지 않습니다."));
 
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(dto.getEmail(), dto.getPassword())
+                new UsernamePasswordAuthenticationToken(dto.email(), dto.password())
         );
 
         return LoginResponse.fromEntityAndTokens(
@@ -53,6 +53,7 @@ public class AuthService {
     @Transactional
     public JwtResponse reissueToken(String refreshToken) {
 
+        // get refresh token from DB and verifying validation
         var dbToken = refreshTokenService.verifyRefreshToken(refreshToken);
         var user = userRepository.findById(dbToken.getUserId())
                 .orElseThrow(() -> new DataNotFoundException("User not found for ID: " + dbToken.getUserId()));
@@ -66,29 +67,25 @@ public class AuthService {
         );
 
         String newAccessToken = jwtTokenProvider.createAccessToken(newAuthentication);
-        return JwtResponse.builder()
-                .accessToken(newAccessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return new JwtResponse(newAccessToken, refreshToken);
     }
 
-    public UserResponse join(JoinRequestDTO dto) {
+    public UserResponse join(JoinRequest dto) {
 
         // 이메일 중복 체크
-        if (userRepository.existsByUserEmail(dto.getEmail())) {
+        if (userRepository.existsByUserEmail(dto.email())) {
             throw new DataDuplicatedException("이미 존재하는 이메일입니다.");
         }
 
         // 비밀번호 암호화
-        String encodedPwd = passwordEncoder.encode(dto.getPassword());
+        String encodedPwd = passwordEncoder.encode(dto.password());
 
-        // UUID 생성
         Users user = Users.builder()
-                .userEmail(dto.getEmail())
+                .userEmail(dto.email())
                 .userPass(encodedPwd)
-                .userName(dto.getUsername())
-                .userNickname(dto.getNickname())
-                .userPhone(dto.getPhone())
+                .userName(dto.username())
+                .userNickname(dto.nickname())
+                .userPhone(dto.phone())
                 .userRole("USER")
                 .build();
         return UserResponse.fromEntity(userRepository.save(user));

@@ -57,7 +57,7 @@ public class OrderService {
 
         // 최종 반환
         return new OrderCheckoutResponse(
-                OrderCheckoutStatus.AVAILABLE.getStatus(),
+                OrderCheckoutStatus.AVAILABLE,
                 totalAmount,
                 shippingFee,
                 totalAmount + shippingFee
@@ -70,23 +70,23 @@ public class OrderService {
         Users user = userRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("사용자를 찾을 수 없습니다."));
 
-        Addresses address = addressRepository.findById(UUID.fromString(req.getAddressId()))
+        Addresses address = addressRepository.findById(UUID.fromString(req.addressId()))
                 .orElseThrow(() -> new DataNotFoundException("주소를 찾을 수 없습니다."));
 
         Orders order = ordersRepository.save(Orders.builder()
                 .userEmail(user.getUserEmail())
                 .userName(user.getUserName())
                 .userPhone(user.getUserPhone())
-                .receiverName(address.getReceiverName())
-                .receiverPhone(address.getReceiverPhone())
-                .receiverZipcode(address.getReceiverZipcode())
-                .receiverAddr1(address.getReceiverAddr1())
-                .receiverAddr2(address.getReceiverAddr2())
+                .receiverName(address.getAddress().getReceiverName())
+                .receiverPhone(address.getAddress().getReceiverPhone())
+                .receiverZipcode(address.getAddress().getReceiverZipcode())
+                .receiverAddr1(address.getAddress().getReceiverAddr1())
+                .receiverAddr2(address.getAddress().getReceiverAddr2())
                 .totalPrice(0) // 초기값 설정, 실제 가격은 추후 계산
                 .orderStatus(OrderStatus.PENDING)
                 .build());
 
-        var cartItems = this.getCartItemsByIds(userEmail, req.getOrderItemIds());
+        var cartItems = this.getCartItemsByIds(userEmail, req.orderItemIds());
         int totalAmount = 0;
         for (var cartItem : cartItems) {
             Product product = productRepository.findById(cartItem.getProductId())

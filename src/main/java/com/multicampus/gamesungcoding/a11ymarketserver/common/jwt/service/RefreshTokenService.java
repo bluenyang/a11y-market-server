@@ -6,16 +6,19 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.repository.Ref
 import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.JwtProperties;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+@Slf4j
 @Component
 public class RefreshTokenService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final UserRepository userRepository;
+    // from JwtProperties
     private final long refreshTokenValidityMs;
 
     public RefreshTokenService(RefreshTokenRepository refreshTokenRepository,
@@ -30,27 +33,29 @@ public class RefreshTokenService {
     public String createRefreshToken(Authentication authentication) {
         String userEmail = authentication.getName();
 
-        var user = userRepository.findByUserEmail(userEmail)
-                .orElseThrow(() -> new DataNotFoundException("User not found with email: " + userEmail));
-        var userId = user.getUserId();
+        var userId = userRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new DataNotFoundException("User not found with email: " + userEmail))
+                .getUserId();
 
-        var existingTokenOpt = refreshTokenRepository.findByUserId(userId);
         var newToken = UUID.randomUUID().toString();
-
         var expiryDate = LocalDateTime.now().plusSeconds(refreshTokenValidityMs / 1000);
 
-        if (existingTokenOpt.isPresent()) {
-            var existingToken = existingTokenOpt.get();
-            existingToken.updateToken(newToken, expiryDate);
-        } else {
-            var refreshToken = RefreshToken.builder()
-                    .userId(userId)
-                    .token(newToken)
-                    .expiryDate(expiryDate)
-                    .build();
-            refreshTokenRepository.save(refreshToken);
-        }
-
+        refreshTokenRepository.findByUserId(userId)
+                .ifPresentOrElse(
+                        token -> {
+                            log.debug("RefreshTokenService - updateRefreshToken: Updating existing refresh token for userId {}", userId);
+                            token.updateToken(newToken, expiryDate);
+                        },
+                        () -> {
+                            log.debug("RefreshTokenService - updateRefreshToken: Creating new refresh token for userId {}", userId);
+                            var createdToken = refreshTokenRepository.save(RefreshToken.builder()
+                                    .userId(userId)
+                                    .token(newToken)
+                                    .expiryDate(expiryDate)
+                                    .build());
+                            log.debug("RefreshTokenService - updateRefreshToken: Created refresh token: {}", createdToken);
+                        }
+                );
         return newToken;
     }
 
@@ -60,6 +65,7 @@ public class RefreshTokenService {
                 .orElseThrow(() -> new DataNotFoundException("Refresh token not found: " + token));
 
         if (refreshToken.getExpiryDate().isBefore(LocalDateTime.now())) {
+            log.debug("RefreshTokenService.verifyRefreshToken - Refresh token expired");
             refreshTokenRepository.delete(refreshToken);
             throw new DataNotFoundException("Refresh token has expired: " + token);
         } else {

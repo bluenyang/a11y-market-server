@@ -80,7 +80,7 @@ class UserManageControllerIntTest {
                         // ADMIN 으로 변경
                         .param("role", "ADMIN"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("SUCCESS"));
+                .andExpect(jsonPath("$.userRole").value("ADMIN"));
 
         // 변경 확인
         var updatedUser = userRepository.findById(testUserId1).orElseThrow();

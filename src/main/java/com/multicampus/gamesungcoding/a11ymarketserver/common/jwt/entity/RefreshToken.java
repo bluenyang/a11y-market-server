@@ -4,7 +4,6 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,9 +13,7 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
 public class RefreshToken {
     @Id
     @UuidV7
@@ -32,7 +29,8 @@ public class RefreshToken {
     @Column(nullable = false)
     private LocalDateTime expiryDate;
 
-    public RefreshToken(UUID userId, String token, LocalDateTime expiryDate) {
+    @Builder
+    private RefreshToken(UUID userId, String token, LocalDateTime expiryDate) {
         this.userId = userId;
         this.token = token;
         this.expiryDate = expiryDate;

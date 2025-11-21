@@ -21,13 +21,9 @@ public class AdminProductManageController {
     // 관리자 - 승인 대기중인 상품 조회
     @GetMapping("/v1/admin/products/pending")
     public ResponseEntity<List<ProductDTO>> inquirePendingProducts() {
-        log.info("AdminUserManageController - inquirePendingProducts");
 
         var list = this.service.inquirePendingProducts();
-        if (list.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
+        log.info("AdminProductManageController - inquirePendingProducts: Retrieved {} pending products", list.size());
         return ResponseEntity.ok(list);
     }
 
@@ -36,7 +32,6 @@ public class AdminProductManageController {
     public ResponseEntity<String> changeProductStatus(@PathVariable String productId,
                                                       @RequestParam ProductStatus status) {
 
-        log.info("AdminUserManageController - changeProductStatus");
         this.service.changeProductStatus(UUID.fromString(productId), status);
         return ResponseEntity.ok("SUCCESS");
     }

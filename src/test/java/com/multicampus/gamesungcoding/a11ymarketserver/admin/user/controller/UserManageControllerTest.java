@@ -3,6 +3,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.admin.user.controller;
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.user.service.AdminUserManageService;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.UserResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
@@ -48,11 +49,16 @@ class UserManageControllerTest {
         String mockRole = "USER";
 
         BDDMockito.given(this.service.changePermission(eq(mockUserId), anyString()))
-                .willReturn("SUCCESS");
+                .willReturn(
+                        UserResponse.builder()
+                                .userId(mockUserId)
+                                .userRole(mockRole)
+                                .build()
+                );
 
         this.mockMvc.perform(patch("/api/v1/admin/users/{userId}/permission", mockUserId)
                         .param("role", mockRole))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("SUCCESS"));
+                .andExpect(jsonPath("$.userRole").value("USER"));
     }
 }

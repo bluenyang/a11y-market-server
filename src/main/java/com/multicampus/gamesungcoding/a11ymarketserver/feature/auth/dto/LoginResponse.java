@@ -7,6 +7,7 @@ public record LoginResponse(String userEmail,
                             String userRole,
                             String accessToken,
                             String refreshToken) {
+
     public static LoginResponse fromEntityAndTokens(Users user,
                                                     String accessToken,
                                                     String refreshToken) {

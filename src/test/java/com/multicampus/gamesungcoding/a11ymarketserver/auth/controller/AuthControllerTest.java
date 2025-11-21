@@ -6,8 +6,8 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataDupl
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.service.RefreshTokenService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.controller.AuthController;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequestDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.UserResponse;
@@ -56,10 +56,9 @@ class AuthControllerTest {
     void testLogin() throws Exception {
         String mockEmail = "user1@example.com";
         String mockPassword = "password123!";
-        var mockReqDto = LoginDTO.builder()
-                .email(mockEmail)
-                .password(mockPassword)
-                .build();
+        var mockReqDto = new LoginRequest(
+                mockEmail,
+                mockPassword);
 
         BDDMockito.given(this.authService.login(any()))
                 .willReturn(new LoginResponse(
@@ -86,21 +85,20 @@ class AuthControllerTest {
     void testLogout() throws Exception {
         this.mockMvc.perform(post("/api/v1/auth/logout"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").value("로그아웃 성공"));
+                .andExpect(jsonPath("$").value("SUCCESS"));
     }
 
     @Test
     @DisplayName("회원가입 성공 테스트")
     void testJoin() throws Exception {
-        var mockReqDto = JoinRequestDTO.builder()
-                .email("user1@example.com")
-                .password("Password123!")
-                .nickname(this.mockName)
-                .username(this.mockName)
-                .phone("01012345678")
-                .build();
+        var mockReqDto = new JoinRequest(
+                "user1@example.com",
+                "Password123!",
+                this.mockName,
+                this.mockName,
+                "01012345678");
 
-        BDDMockito.given(this.authService.join(any(JoinRequestDTO.class)))
+        BDDMockito.given(this.authService.join(any(JoinRequest.class)))
                 .willReturn(
                         UserResponse.builder()
                                 .userId(UUID.randomUUID())
@@ -119,15 +117,14 @@ class AuthControllerTest {
     @Test
     @DisplayName("회원가입 실패 - 이메일 중복 테스트")
     void testJoin_EmailConflict() throws Exception {
-        var mockReqDto = JoinRequestDTO.builder()
-                .email("user1@example.com")
-                .password("Password123!")
-                .nickname(this.mockName)
-                .username(this.mockName)
-                .phone("01012345678")
-                .build();
+        var mockReqDto = new JoinRequest(
+                "user1@example.com",
+                "Password123!",
+                this.mockName,
+                this.mockName,
+                "01012345678");
 
-        BDDMockito.given(this.authService.join(any(JoinRequestDTO.class)))
+        BDDMockito.given(this.authService.join(any(JoinRequest.class)))
                 .willThrow(new DataDuplicatedException("이미 존재하는 이메일입니다."));
 
         this.mockMvc.perform(post("/api/v1/auth/join")
@@ -140,15 +137,14 @@ class AuthControllerTest {
     @Test
     @DisplayName("회원가입 실패 - 비밀번호 유효성 검사 테스트")
     void testJoin_InvalidPassword() throws Exception {
-        var mockReqDto = JoinRequestDTO.builder()
-                .email("user1@example.com")
-                .password("1234")
-                .nickname(this.mockName)
-                .username(this.mockName)
-                .phone("01012345678")
-                .build();
+        var mockReqDto = new JoinRequest(
+                "user1@example.com",
+                "1234",
+                this.mockName,
+                this.mockName,
+                "01012345678");
 
-        BDDMockito.given(this.authService.join(any(JoinRequestDTO.class)))
+        BDDMockito.given(this.authService.join(any(JoinRequest.class)))
                 .willReturn(null);
 
         this.mockMvc.perform(post("/api/v1/auth/join")

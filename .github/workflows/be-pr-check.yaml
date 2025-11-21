@@ -163,7 +163,9 @@ jobs:
           # prune unnecessary image
           docker image prune -f
   post-comment:
-    needs: deploy
+    needs:
+      - deploy
+      - build-and-push
     runs-on: self-hosted
     env:
       PR_NUMBER: ${{ needs.build-and-push.outputs.pr_number }}

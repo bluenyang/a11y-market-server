@@ -2,8 +2,8 @@ package com.multicampus.gamesungcoding.a11ymarketserver.auth.service;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.service.RefreshTokenService;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequestDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
@@ -68,10 +68,9 @@ class AuthServiceTest {
     @Test
     @DisplayName("로그인 성공 테스트")
     void loginSuccessTest() {
-        var loginDto = LoginDTO.builder()
-                .email(this.mockEmail)
-                .password("password123!")
-                .build();
+        var loginDto = new LoginRequest(
+                this.mockEmail,
+                "password123!");
 
         given(this.userRepository.findByUserEmail(this.mockEmail))
                 .willReturn(Optional.of(this.mockUser));
@@ -105,10 +104,9 @@ class AuthServiceTest {
     @Test
     @DisplayName("로그인 실패 테스트 - 잘못된 비밀번호")
     void loginFailWrongPasswordTest() {
-        var loginDto = LoginDTO.builder()
-                .email(this.mockEmail)
-                .password("WrongPassword!")
-                .build();
+        var loginDto = new LoginRequest(
+                this.mockEmail,
+                "WrongPassword!");
 
         given(this.userRepository.findByUserEmail(this.mockEmail))
                 .willReturn(Optional.of(this.mockUser));
@@ -123,17 +121,16 @@ class AuthServiceTest {
     @Test
     @DisplayName("회원가입 성공 테스트")
     void joinSuccessTest() {
-        var joinDto = JoinRequestDTO.builder()
-                .email(this.mockEmail)
-                .password("password123!")
-                .username("User One")
-                .nickname("user-one")
-                .phone("010-1234-5678")
-                .build();
+        var joinDto = new JoinRequest(
+                this.mockEmail,
+                "password123!",
+                "User One",
+                "user-one",
+                "010-1234-5678");
 
         given(this.userRepository.existsByUserEmail(this.mockEmail))
                 .willReturn(false);
-        given(this.passwordEncoder.encode(joinDto.getPassword()))
+        given(this.passwordEncoder.encode(joinDto.password()))
                 .willReturn("encodedPassword");
         given(this.userRepository.save(any(Users.class)))
                 .willAnswer(invocation -> invocation.getArgument(0));

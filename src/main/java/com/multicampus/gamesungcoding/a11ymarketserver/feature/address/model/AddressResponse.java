@@ -14,12 +14,12 @@ public record AddressResponse(UUID addressId, UUID userId, String addressName,
         return new AddressResponse(
                 address.getAddressId(),
                 address.getUserId(),
-                address.getAddressName(),
-                address.getReceiverName(),
-                address.getReceiverPhone(),
-                address.getReceiverZipcode(),
-                address.getReceiverAddr1(),
-                address.getReceiverAddr2(),
+                address.getAddress().getAddressName(),
+                address.getAddress().getReceiverName(),
+                address.getAddress().getReceiverPhone(),
+                address.getAddress().getReceiverZipcode(),
+                address.getAddress().getReceiverAddr1(),
+                address.getAddress().getReceiverAddr2(),
                 address.getCreatedAt());
     }
 
