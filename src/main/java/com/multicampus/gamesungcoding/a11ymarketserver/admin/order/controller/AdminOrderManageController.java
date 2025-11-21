@@ -2,12 +2,14 @@ package com.multicampus.gamesungcoding.a11ymarketserver.admin.order.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.order.model.AdminOrderResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.order.service.AdminOrderService;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.dto.OrderDetailResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -26,13 +28,14 @@ public class AdminOrderManageController {
         return ResponseEntity.ok(orders);
     }
 
-    // 관리자 - 특정 주문 조회 (미구현)
+    // 관리자 - 특정 주문 조회
     @GetMapping("/v1/admin/orders/{orderId}")
-    public ResponseEntity<String> inquireOrderDetails(@PathVariable String orderId) {
+    public ResponseEntity<OrderDetailResponse> inquireOrderDetails(@PathVariable UUID orderId) {
         log.info("AdminUserManageController - inquireOrderDetails");
 
-        // Placeholder for future implementation
-        return ResponseEntity.ok("Order details inquiry functionality is under development.");
+        OrderDetailResponse response = adminOrderService.getOrderDetails(orderId);
+
+        return ResponseEntity.ok(response);
     }
 
     // 관리자 - 주문 상태 변경 (미구현)
