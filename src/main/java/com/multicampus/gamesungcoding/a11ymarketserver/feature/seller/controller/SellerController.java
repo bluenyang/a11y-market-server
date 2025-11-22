@@ -89,7 +89,17 @@ public class SellerController {
             @RequestParam(required = false) String status) {
 
         List<SellerOrderItemResponse> responses = sellerService.getReceivedOrders(userDetails.getUsername(), status);
-
         return ResponseEntity.ok(responses);
+    }
+
+    @PatchMapping("/v1/seller/orders/{orderId}/status")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> updateOrderStatus(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable String orderId,
+            @RequestBody @Valid SellerOrderStatusUpdateRequest request) {
+
+        sellerService.updateOrderStatus(userDetails.getUsername(), UUID.fromString(orderId), request);
+        return ResponseEntity.noContent().build();
     }
 }

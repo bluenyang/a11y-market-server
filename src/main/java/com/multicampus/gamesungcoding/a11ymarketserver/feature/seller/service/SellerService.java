@@ -5,7 +5,10 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotF
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidRequestException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.UserNotFoundException;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderStatus;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.Orders;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrderItemsRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrdersRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.Product;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductDTO;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductStatus;
@@ -29,6 +32,7 @@ public class SellerService {
     private final SellerRepository sellerRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final OrdersRepository ordersRepository;
     private final OrderItemsRepository orderItemsRepository;
 
     public SellerApplyResponse applySeller(String userEmail, SellerApplyRequest request) {
@@ -191,7 +195,71 @@ public class SellerService {
                 throw new InvalidRequestException("유효하지 않은 주문 상태입니다.");
             }
         }
-        
+
         return orderItemsRepository.findSellerReceivedOrders(userEmail, statusFilter);
+    }
+
+    @Transactional
+    public void updateOrderStatus(String userEmail, UUID orderId, SellerOrderStatusUpdateRequest request) {
+
+        Seller seller = sellerRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new DataNotFoundException("판매자 정보를 찾을 수 없습니다."));
+
+        if (!SellerSubmitStatus.APPROVED.getStatus().equals(seller.getSellerSubmitStatus())) {
+            throw new InvalidRequestException("승인된 판매자만 주문 상태를 변경할 수 있습니다.");
+        }
+
+        Orders order = ordersRepository.findById(orderId)
+                .orElseThrow(() -> new DataNotFoundException("주문 정보를 찾을 수 없습니다."));
+
+        List<UUID> productIds = productRepository.findBySellerId(seller.getSellerId())
+                .stream()
+                .map(Product::getProductId)
+                .toList();
+
+        if (productIds.isEmpty()) {
+            throw new InvalidRequestException("판매자의 상품이 존재하지 않습니다.");
+        }
+
+        boolean isMyOrder = orderItemsRepository.existsByOrderIdAndProductIdIn(orderId, productIds);
+
+        if (!isMyOrder) {
+            throw new InvalidRequestException("해당 주문에 대한 변경 권한이 없습니다.");
+        }
+
+        OrderStatus currentStatus = order.getOrderStatus();
+        OrderStatus nextStatus = request.status();
+
+        validateSellerOrderStatusTransition(currentStatus, nextStatus);
+
+        order.updateOrderStatus(request.status());
+    }
+
+    private void validateSellerOrderStatusTransition(OrderStatus current, OrderStatus next) {
+
+        if (current == next) {
+            throw new InvalidRequestException("이미 동일한 주문 상태입니다.");
+        }
+
+        switch (current) {
+            case PAID -> {
+                if (next != OrderStatus.ACCEPTED && next != OrderStatus.REJECTED) {
+                    throw new InvalidRequestException("PAID 상태에서는 ACCEPTED 또는 REJECTED로만 변경할 수 있습니다.");
+                }
+            }
+            case ACCEPTED -> {
+                if (next != OrderStatus.SHIPPED) {
+                    throw new InvalidRequestException("ACCEPTED 상태에서는 SHIPPED로만 변경할 수 있습니다.");
+                }
+            }
+            case SHIPPED -> {
+                if (next != OrderStatus.DELIVERED) {
+                    throw new InvalidRequestException("SHIPPED 상태에서는 DELIVERED로만 변경할 수 있습니다.");
+                }
+            }
+            default -> {
+                throw new InvalidRequestException("현재 주문 상태에서는 판매자가 상태를 변경할 수 없습니다.");
+            }
+        }
     }
 }

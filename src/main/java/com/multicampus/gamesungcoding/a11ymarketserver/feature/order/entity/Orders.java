@@ -82,8 +82,11 @@ public class Orders {
         this.orderStatus = orderStatus;
     }
 
-
     public void updateTotalPrice(int totalPrice) {
         this.totalPrice = totalPrice;
+    }
+
+    public void updateOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 }
