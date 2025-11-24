@@ -1,11 +1,8 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.service;
 
 
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartItemUpdatedResponse;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartItemDeleteRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.*;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.Cart;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartAddRequest;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartItemResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.CartItems;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.repository.CartItemRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.repository.CartRepository;
@@ -17,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,19 +24,36 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final UserRepository userRepository;
 
-    public List<CartItemResponse> getCartItems(String UserEmail) {
-        return cartItemRepository.findAllByUserEmailToResponse(UserEmail);
-    }
+    public CartItemListResponse getCartItems(String UserEmail) {
+        var list = cartItemRepository.findAllByUserEmailToResponse(UserEmail);
+        int total = list.stream()
+                .mapToInt(item -> item.quantity() * item.productPrice())
+                .sum();
 
-    public int getCartTotal(String userEmail) {
-        // 현재 cart_items에 price가 없으므로 총액은 이 단계에서 계산 불가.
-        // TODO: product 가격 조인 후 합산 (ex. productRepository로 가격 조회해서 계산)
-        return 0;
+        var groupedList = list.stream()
+                .collect(Collectors.groupingBy(
+                        CartItemDto::sellerName,
+                        Collectors.mapping(
+                                item ->
+                                        item, Collectors.toList()
+                        )
+                ))
+                .entrySet()
+                .stream()
+                .map(entry -> new CartItemListDto(
+                        entry.getKey(),
+                        entry.getValue().getFirst().sellerId(),
+                        calculateItemsTotal(entry.getValue()),
+                        entry.getValue()
+                ))
+                .toList();
+
+        return new CartItemListResponse(groupedList, total);
     }
 
     @Transactional
     public CartItemUpdatedResponse addItem(CartAddRequest req, String userEmail) {
-        var cartId = GetCartIdByUserEmail(userEmail);
+        var cartId = getCartIdByUserEmail(userEmail);
         CartItems cart = cartItemRepository.findByCartIdAndProductId(cartId, UUID.fromString(req.productId()))
                 .map(existing -> {
                     existing.changeQuantity(existing.getQuantity() + req.quantity());
@@ -58,7 +73,7 @@ public class CartService {
     public CartItemUpdatedResponse updateQuantity(UUID cartItemId, int quantity, String userEmail) {
 
         // 검증: 해당 cartItemId가 userEmail의 장바구니에 속하는지 확인
-        UUID cartId = GetCartIdByUserEmail(userEmail);
+        UUID cartId = getCartIdByUserEmail(userEmail);
         CartItems existingItem = cartItemRepository.findById(cartItemId)
                 .orElseThrow(() -> new NoSuchElementException("Cart item not found: " + cartItemId));
         if (!existingItem.getCartId().equals(cartId)) {
@@ -81,7 +96,7 @@ public class CartService {
                 .toList();
 
         // 검증: 모든 itemIds가 userEmail의 장바구니에 속하는지 확인
-        UUID cartId = GetCartIdByUserEmail(userEmail);
+        UUID cartId = getCartIdByUserEmail(userEmail);
         List<UUID> invalidItems = cartItemRepository.findAllById(itemIds).stream()
                 .filter(item -> !item.getCartId().equals(cartId))
                 .map(CartItems::getCartItemId)
@@ -93,7 +108,7 @@ public class CartService {
         cartItemRepository.deleteAllByIdInBatch(itemIds);
     }
 
-    private UUID GetCartIdByUserEmail(String userEmail) {
+    private UUID getCartIdByUserEmail(String userEmail) {
         UUID userId = userRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new NoSuchElementException("User not found: " + userEmail))
                 .getUserId();
@@ -107,5 +122,11 @@ public class CartService {
                                 .build())
                         .getCartId()
                 );
+    }
+
+    private int calculateItemsTotal(List<CartItemDto> items) {
+        return items.stream()
+                .mapToInt(item -> item.productPrice() * item.quantity())
+                .sum();
     }
 }

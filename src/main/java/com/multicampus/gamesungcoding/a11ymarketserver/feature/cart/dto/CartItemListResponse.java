@@ -5,7 +5,7 @@ import jakarta.validation.constraints.Positive;
 import java.util.List;
 
 public record CartItemListResponse(
-        List<CartItemResponse> items,
+        List<CartItemListDto> items,
 
         @Positive(message = "Total must be positive")
         int total) {

@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/actuator/health",
                                 "/api/*/auth/login",
+                                "/api/*/auth/login-refresh",
                                 "/api/*/auth/join",
                                 "/api/*/auth/refresh",
                                 "/api/*/auth/oauth2/code/kakao",

@@ -30,12 +30,7 @@ public class CartController {
             @AuthenticationPrincipal UserDetails userDetails) {
 
         var userEmail = userDetails.getUsername();
-        return ResponseEntity.ok(
-                new CartItemListResponse(
-                        cartService.getCartItems(userEmail),
-                        cartService.getCartTotal(userEmail)
-                )
-        );
+        return ResponseEntity.ok(cartService.getCartItems(userEmail));
     }
 
     // POST /api/v1/cart/items 상품 추가 기능

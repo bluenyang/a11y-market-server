@@ -31,6 +31,11 @@ public class AuthController {
         return ResponseEntity.ok(authService.login(dto));
     }
 
+    @PostMapping("/v1/auth/login-refresh")
+    public ResponseEntity<LoginResponse> loginRefresh(@RequestBody RefreshRequest dto) {
+        return ResponseEntity.ok(authService.loginRefresh(dto.refreshToken()));
+    }
+
     @PostMapping("/v1/auth/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<String> logout(

@@ -1,10 +1,9 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.UserInfo;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
 
-public record LoginResponse(String userEmail,
-                            String userNickname,
-                            String userRole,
+public record LoginResponse(UserInfo user,
                             String accessToken,
                             String refreshToken) {
 
@@ -13,9 +12,7 @@ public record LoginResponse(String userEmail,
                                                     String refreshToken) {
 
         return new LoginResponse(
-                user.getUserEmail(),
-                user.getUserNickname(),
-                user.getUserRole(),
+                UserInfo.fromEntity(user),
                 accessToken,
                 refreshToken
         );

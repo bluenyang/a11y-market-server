@@ -50,14 +50,32 @@ public class AuthService {
         );
     }
 
+    public LoginResponse loginRefresh(String refreshToken) {
+
+        // get refresh token from DB and verifying validation
+        var user = getUserByRefreshToken(refreshToken);
+        var userDetails = userDetailsService.loadUserByUsername(user.getUserEmail());
+
+        var newAuthentication = new UsernamePasswordAuthenticationToken(
+                userDetails,
+                null,
+                userDetails.getAuthorities()
+        );
+
+        String newAccessToken = jwtTokenProvider.createAccessToken(newAuthentication);
+        String newRefreshToken = refreshTokenService.createRefreshToken(newAuthentication);
+
+        return LoginResponse.fromEntityAndTokens(
+                user,
+                newAccessToken,
+                newRefreshToken
+        );
+    }
+
     @Transactional
     public JwtResponse reissueToken(String refreshToken) {
 
-        // get refresh token from DB and verifying validation
-        var dbToken = refreshTokenService.verifyRefreshToken(refreshToken);
-        var user = userRepository.findById(dbToken.getUserId())
-                .orElseThrow(() -> new DataNotFoundException("User not found for ID: " + dbToken.getUserId()));
-
+        var user = getUserByRefreshToken(refreshToken);
         var userDetails = userDetailsService.loadUserByUsername(user.getUserEmail());
 
         var newAuthentication = new UsernamePasswordAuthenticationToken(
@@ -95,5 +113,11 @@ public class AuthService {
         userRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new InvalidRequestException("유효하지 않은 사용자입니다."));
         refreshTokenService.deleteRefreshToken(userEmail);
+    }
+
+    private Users getUserByRefreshToken(String refreshToken) {
+        var dbToken = refreshTokenService.verifyRefreshToken(refreshToken);
+        return userRepository.findById(dbToken.getUserId())
+                .orElseThrow(() -> new DataNotFoundException("User not found for ID: " + dbToken.getUserId()));
     }
 }
