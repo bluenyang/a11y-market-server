@@ -132,7 +132,7 @@ jobs:
           
           # deploy path
           mkdir -p ${{ env.DEPLOY_PATH }}/config
-          
+            
           # write compose file from runner
           echo "[LOG] build compose file ..."
           cat <<'EOF' > ${{ env.DEPLOY_PATH }}/docker-compose.yaml
@@ -163,9 +163,7 @@ jobs:
           # prune unnecessary image
           docker image prune -f
   post-comment:
-    needs:
-      - deploy
-      - build-and-push
+    needs: deploy
     runs-on: self-hosted
     env:
       PR_NUMBER: ${{ needs.build-and-push.outputs.pr_number }}
@@ -175,7 +173,7 @@ jobs:
         with:
           script: |
             const domain = "${{ secrets.QA_DOMAIN }}"
-            const message = `🚀 테스트/QA 서버가 배포되었습니다.\n\nurl: [Preview](https://be-pr-${{ env.PR_NUMBER }}.${domain})`;
+            const message = `🚀 테스트/QA 서버가 배포되었습니다.\n\n- url: `https://be-pr-${{ env.PR_NUMBER }}.${domain}``;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,

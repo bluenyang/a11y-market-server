@@ -29,4 +29,18 @@ public interface OrderItemsRepository extends JpaRepository<OrderItems, UUID> {
             @Param("status") OrderItemStatus status);
 
     boolean existsByOrderIdAndProductIdIn(UUID orderId, List<UUID> productIds);
+
+    @Query("""
+            SELECT new com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model.SellerOrderItemResponse(o, oi)
+              FROM OrderItems oi, Orders o, Product p, Seller s, Users u
+             WHERE oi.orderId = o.orderId
+               AND oi.productId = p.productId
+               AND p.sellerId = s.sellerId
+               AND s.userId = u.userId
+               AND u.userEmail = :userEmail
+               AND oi.orderItemStatus IN :statuses
+            """)
+    List<SellerOrderItemResponse> findSellerClaims(
+            @Param("userEmail") String userEmail,
+            @Param("statuses") List<OrderItemStatus> statuses);
 }

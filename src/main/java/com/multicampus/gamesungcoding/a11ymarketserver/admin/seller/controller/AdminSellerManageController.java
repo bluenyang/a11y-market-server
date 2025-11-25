@@ -4,10 +4,12 @@ import com.multicampus.gamesungcoding.a11ymarketserver.admin.seller.service.Admi
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model.SellerApplyResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -26,13 +28,13 @@ public class AdminSellerManageController {
         return ResponseEntity.ok(pendingSellers);
     }
 
-    // 관리자 - 판매자 상태 변경 (미구현)
+    // 관리자 - 판매자 상태 변경
     @PatchMapping("/v1/admin/sellers/{sellerId}/status")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<String> changeSellerStatus(@PathVariable String sellerId, @RequestParam String status) {
-        log.info("AdminUserManageController - changeSellerStatus");
 
-        // Placeholder for future implementation
-        return ResponseEntity.ok("Change seller status functionality is under development.");
+        adminSellerService.updateSellerStatus(UUID.fromString(sellerId), status);
+        return ResponseEntity.noContent().build();
     }
 
     // 관리자 - 판매자 정보 수정 (미구현)

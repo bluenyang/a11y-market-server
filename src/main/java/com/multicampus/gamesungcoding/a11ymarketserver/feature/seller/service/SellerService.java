@@ -5,6 +5,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotF
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidRequestException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.UserNotFoundException;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.Orders;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrderItemsRepository;
@@ -262,4 +263,67 @@ public class SellerService {
             }
         }
     }
+
+    @Transactional
+    public void processOrderClaim(String userEmail, UUID orderItemId, SellerOrderClaimProcessRequest request) {
+        Seller seller = sellerRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new DataNotFoundException("판매자 정보를 찾을 수 없습니다."));
+
+        if (!SellerSubmitStatus.APPROVED.getStatus().equals(seller.getSellerSubmitStatus())) {
+            throw new InvalidRequestException("승인된 판매자만 취소/반품 처리가 가능합니다.");
+        }
+
+        OrderItems orderItem = orderItemsRepository.findById(orderItemId)
+                .orElseThrow(() -> new DataNotFoundException("주문 상품 정보를 찾을 수 없습니다."));
+
+        Product product = productRepository.findById(orderItem.getProductId())
+                .orElseThrow(() -> new DataNotFoundException("상품 정보를 찾을 수 없습니다."));
+
+        if (!product.getSellerId().equals(seller.getSellerId())) {
+            throw new InvalidRequestException("본인의 상품 주문만 처리할 수 있습니다.");
+        }
+
+        OrderItemStatus currentStatus = orderItem.getOrderItemStatus();
+
+        if (currentStatus != OrderItemStatus.CANCEL_PENDING &&
+                currentStatus != OrderItemStatus.RETURN_PENDING) {
+            throw new InvalidRequestException("요청 상태의 주문만 처리할 수 있습니다.");
+        }
+
+        String action = request.action().toUpperCase();
+
+        if ("APPROVE".equals(action)) {
+            if (currentStatus == OrderItemStatus.CANCEL_PENDING) {
+                orderItem.updateOrderItemStatus(OrderItemStatus.CANCELED);
+            } else if (currentStatus == OrderItemStatus.RETURN_PENDING) {
+                orderItem.updateOrderItemStatus(OrderItemStatus.RETURNED);
+            }
+        } else if ("REJECT".equals(action)) {
+
+            orderItem.updateOrderItemStatus(OrderItemStatus.ORDERED);
+        } else {
+            throw new InvalidRequestException("유효하지 않은 처리 요청입니다. (APPROVE / REJECT)");
+        }
+
+        orderItemsRepository.save(orderItem);
+    }
+
+    @Transactional(readOnly = true)
+    public List<SellerOrderItemResponse> getOrderClaims(String userEmail) {
+
+        Seller seller = sellerRepository.findByUserEmail(userEmail)
+                .orElseThrow(() -> new DataNotFoundException("판매자 정보를 찾을 수 없습니다."));
+
+        if (!SellerSubmitStatus.APPROVED.getStatus().equals(seller.getSellerSubmitStatus())) {
+            throw new InvalidRequestException("승인된 판매자만 취소/반품/교환 목록을 조회할 수 있습니다.");
+        }
+
+        List<OrderItemStatus> claimStatuses = List.of(
+                OrderItemStatus.CANCEL_PENDING,
+                OrderItemStatus.RETURN_PENDING
+        );
+
+        return orderItemsRepository.findSellerClaims(userEmail, claimStatuses);
+    }
+
 }

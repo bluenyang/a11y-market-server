@@ -64,4 +64,8 @@ public class OrderItems {
         this.orderItemStatus = OrderItemStatus.CANCELED;
         this.cancelReason = reason;
     }
+
+    public void updateOrderItemStatus(OrderItemStatus status) {
+        this.orderItemStatus = status;
+    }
 }

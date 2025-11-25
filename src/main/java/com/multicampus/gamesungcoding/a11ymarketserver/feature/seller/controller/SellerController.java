@@ -42,7 +42,6 @@ public class SellerController {
     }
 
     @GetMapping("/v1/seller/products")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<List<ProductDTO>> getMyProducts(
             @AuthenticationPrincipal UserDetails userDetails) {
 
@@ -52,7 +51,6 @@ public class SellerController {
 
 
     @PutMapping("/v1/seller/products/{productId}")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ProductDTO> updateProduct(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String productId,
@@ -73,7 +71,6 @@ public class SellerController {
     }
 
     @PatchMapping("/v1/seller/products/{productId}/stock")
-    @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<ProductDTO> updateProductStock(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable String productId,
@@ -101,5 +98,23 @@ public class SellerController {
 
         sellerService.updateOrderStatus(userDetails.getUsername(), UUID.fromString(orderId), request);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/v1/seller/claims/{claimId}/approve")
+    public ResponseEntity<Void> processOrderClaim(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable String claimId,
+            @RequestBody @Valid SellerOrderClaimProcessRequest request) {
+
+        sellerService.processOrderClaim(userDetails.getUsername(), UUID.fromString(claimId), request);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/v1/seller/claims")
+    public ResponseEntity<List<SellerOrderItemResponse>> getOrderClaims(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        List<SellerOrderItemResponse> claims = sellerService.getOrderClaims(userDetails.getUsername());
+        return ResponseEntity.ok(claims);
     }
 }
