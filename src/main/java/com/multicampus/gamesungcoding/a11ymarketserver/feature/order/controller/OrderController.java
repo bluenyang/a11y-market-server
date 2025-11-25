@@ -77,4 +77,14 @@ public class OrderController {
 
         orderService.cancelOrderItems(userDetails.getUsername(), UUID.fromString(orderId), req);
     }
+
+    // 주문 확정
+    @PostMapping("v1/users/me/orders/{orderId}/confirm")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void confirmOrderItems(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable String orderId,
+            @RequestBody @Valid OrderConfirmRequest req) {
+        orderService.confirmOrderItems(userDetails.getUsername(), orderId, req);
+    }
 }
