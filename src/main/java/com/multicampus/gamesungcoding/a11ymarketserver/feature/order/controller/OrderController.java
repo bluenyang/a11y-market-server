@@ -5,6 +5,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.service.Ord
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -64,5 +65,16 @@ public class OrderController {
         return ResponseEntity.ok(
                 orderService.getMyOrderDetail(orderId, userDetails.getUsername())
         );
+    }
+
+    // 주문 취소
+    @PostMapping("/v1/users/me/orders/{orderId}/cancel-request")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void cancelOrderItems(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable String orderId,
+            @RequestBody @Valid OrderCancelRequest req) {
+
+        orderService.cancelOrderItems(userDetails.getUsername(), UUID.fromString(orderId), req);
     }
 }

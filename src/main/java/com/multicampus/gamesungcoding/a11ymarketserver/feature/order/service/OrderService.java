@@ -180,4 +180,24 @@ public class OrderService {
         }
         return OrderDetailResponse.fromEntity(order, items);
     }
+
+    @Transactional
+    public void cancelOrderItems(String userEmail, UUID orderId, OrderCancelRequest req) {
+        // 권한 검증
+        Orders order = ordersRepository
+                .findByOrderIdAndUserEmail(orderId, userEmail)
+                .orElseThrow(() -> new InvalidRequestException("잘못된 요청입니다."));
+
+        var requestedItem = UUID.fromString(req.orderItemId());
+        OrderItems orderItem = orderItemsRepository
+                .findById(requestedItem)
+                .orElseThrow(() -> new DataNotFoundException("주문 상품을 찾을 수 없습니다."));
+
+        if (!orderItem.getOrderId().equals(order.getOrderId())) {
+            throw new InvalidRequestException("잘못된 요청입니다.");
+        }
+
+        // 주문 취소 처리
+        orderItem.cancelOrderItem(req.reason());
+    }
 }
