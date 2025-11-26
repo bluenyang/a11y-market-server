@@ -40,7 +40,7 @@ public class AdminOrderService {
         Orders order = ordersRepository.findById(orderId)
                 .orElseThrow(() -> new DataNotFoundException("Order not found"));
 
-        List<OrderItems> items = orderItemsRepository.findByOrderId(orderId);
+        List<OrderItems> items = orderItemsRepository.findAllByOrderId(orderId);
 
         return ResponseEntity.ok(OrderDetailResponse.fromEntity(order, items));
     }
@@ -51,7 +51,7 @@ public class AdminOrderService {
                 .orElseThrow(() -> new DataNotFoundException("Order not found"));
 
         OrderStatus newStatus;
-        
+
         try {
             newStatus = OrderStatus.valueOf(status.toUpperCase());
         } catch (IllegalArgumentException e) {

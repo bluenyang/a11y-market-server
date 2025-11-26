@@ -173,7 +173,7 @@ public class OrderService {
                 .findByOrderIdAndUserEmail(orderId, userEmail)
                 .orElseThrow(() -> new DataNotFoundException("주문을 찾을 수 없습니다."));
 
-        List<OrderItems> items = orderItemsRepository.findByOrderId(order.getOrderId());
+        List<OrderItems> items = orderItemsRepository.findAllByOrderId(order.getOrderId());
 
         if (items.isEmpty()) {
             throw new DataNotFoundException("주문 아이템이 없습니다.");
@@ -199,5 +199,60 @@ public class OrderService {
 
         // 주문 취소 처리
         orderItem.cancelOrderItem(req.reason());
+    }
+
+    // 주문 구매 확정
+    @Transactional
+    public void confirmOrderItems(String userEmail, String orderId, OrderConfirmRequest req) {
+
+        // orderId 검증
+        UUID orderUuid;
+        try {
+            orderUuid = UUID.fromString(orderId);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRequestException("유효하지 않은 주문 ID 입니다.");
+        }
+
+        // 본인 주문인지 검증
+        Orders order = ordersRepository
+                .findByOrderIdAndUserEmail(orderUuid, userEmail)
+                .orElseThrow(() -> new DataNotFoundException("주문을 찾을 수 없습니다."));
+
+        UUID itemUuid;
+
+        try {
+            itemUuid = UUID.fromString(req.orderItemId());
+        } catch (IllegalArgumentException e) {
+            throw new InvalidRequestException("유효하지 않은 주문 상품 ID가 포함되어 있습니다.");
+        }
+
+        var item = orderItemsRepository.findById(itemUuid)
+                .orElseThrow(() -> new DataNotFoundException("주문 상품을 찾을 수 없습니다."));
+
+        if (item.getOrderId().equals(order.getOrderId())) {
+            throw new InvalidRequestException("주문 상품이 해당 주문에 포함되어 있지 않습니다.");
+        }
+
+
+        if (item.getOrderItemStatus() == OrderItemStatus.CONFIRMED) {
+            throw new InvalidRequestException("이미 구매 확정된 상품이 포함되어 있습니다.");
+        }
+
+        if (item.getOrderItemStatus() != OrderItemStatus.SHIPPED) {
+            throw new InvalidRequestException("배송 완료된 상품만 구매 확정할 수 있습니다.");
+        }
+
+        item.updateOrderItemStatus(OrderItemStatus.CONFIRMED);
+
+        // 주문 상태 전체 갱신
+        var allItems = orderItemsRepository.findAllByOrderId(orderUuid);
+
+        boolean hasNotFinishedItem = allItems.stream()
+                .anyMatch(i -> i.getOrderItemStatus() != OrderItemStatus.CONFIRMED
+                        && i.getOrderItemStatus() != OrderItemStatus.CANCELED);
+
+        if (!hasNotFinishedItem) {
+            order.updateOrderStatus(OrderStatus.DELIVERED);
+        }
     }
 }
