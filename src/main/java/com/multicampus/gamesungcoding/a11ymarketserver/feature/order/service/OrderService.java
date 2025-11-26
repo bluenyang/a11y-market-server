@@ -10,10 +10,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.CartI
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.repository.CartItemRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.repository.CartRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.dto.*;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderCheckoutStatus;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderStatus;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.Orders;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.*;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrderItemsRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrdersRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.Product;
@@ -175,7 +172,7 @@ public class OrderService {
         List<OrderDetailResponse> result = new ArrayList<>(List.of());
 
         for (Orders order : orders) {
-            List<OrderItems> items = orderItemsRepository.findByOrderId(order.getOrderId());
+            List<OrderItems> items = orderItemsRepository.findAllByOrderId(order.getOrderId());
             result.add(OrderDetailResponse.fromEntity(order, items));
         }
 
