@@ -163,7 +163,9 @@ jobs:
           # prune unnecessary image
           docker image prune -f
   post-comment:
-    needs: deploy
+    needs:
+      - deploy
+      - build-and-push
     runs-on: self-hosted
     env:
       PR_NUMBER: ${{ needs.build-and-push.outputs.pr_number }}
@@ -173,7 +175,7 @@ jobs:
         with:
           script: |
             const domain = "${{ secrets.QA_DOMAIN }}"
-            const message = `🚀 테스트/QA 서버가 배포되었습니다.\n\n- url: [링크](https://be-pr-${{ env.PR_NUMBER }}.${domain})`;
+            const message = `🚀 테스트/QA 서버가 배포되었습니다.\n\n- url: [링크](https://be-pr-${{ env.PR_NUMBER }}.${domain}/swagger-ui.html)`;
 
             await github.rest.issues.createComment({
               owner: context.repo.owner,
