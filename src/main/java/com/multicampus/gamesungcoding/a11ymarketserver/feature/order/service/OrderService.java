@@ -270,7 +270,7 @@ public class OrderService {
             throw new InvalidRequestException("이미 결제된 주문입니다.");
         }
 
-        List<OrderItems> items = orderItemsRepository.findByOrderId(order.getOrderId());
+        List<OrderItems> items = orderItemsRepository.findAllByOrderId(order.getOrderId());
 
         if (items.isEmpty()) {
             throw new InvalidRequestException("주문 상품이 없습니다.");
