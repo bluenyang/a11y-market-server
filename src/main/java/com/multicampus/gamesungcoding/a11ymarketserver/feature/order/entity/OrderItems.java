@@ -1,5 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidRequestException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -65,6 +66,17 @@ public class OrderItems {
     }
 
     public void cancelOrderItem(String reason) {
+        if (this.orderItemStatus == OrderItemStatus.SHIPPED ||
+                this.orderItemStatus == OrderItemStatus.CONFIRMED ||
+                this.orderItemStatus == OrderItemStatus.RETURNED) {
+            throw new InvalidRequestException("이미 배송된 상품은 취소할 수 없습니다.");
+        }
+
+        if (this.orderItemStatus == OrderItemStatus.CANCEL_PENDING ||
+                this.orderItemStatus == OrderItemStatus.CANCELED ||
+                this.orderItemStatus == OrderItemStatus.RETURN_PENDING) {
+            throw new InvalidRequestException("이미 취소 요청이 진행 중이거나 완료된 상품입니다.");
+        }
         this.orderItemStatus = OrderItemStatus.CANCELED;
         this.cancelReason = reason;
     }
