@@ -1,7 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.product.controller;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.Product;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductStatus;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Product;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;

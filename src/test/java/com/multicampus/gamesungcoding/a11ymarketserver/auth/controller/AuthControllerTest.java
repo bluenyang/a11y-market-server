@@ -5,6 +5,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityCon
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataDuplicatedException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.service.RefreshTokenService;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.CorsProperties;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.controller.AuthController;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginRequest;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -35,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Import(SecurityConfig.class)
 @WebMvcTest(AuthController.class)
+@EnableConfigurationProperties(CorsProperties.class)
 class AuthControllerTest {
     @Autowired
     private MockMvc mockMvc;

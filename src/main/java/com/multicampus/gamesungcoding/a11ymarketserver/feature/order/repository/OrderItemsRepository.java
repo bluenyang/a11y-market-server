@@ -2,7 +2,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository
 
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model.SellerOrderItemResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto.SellerOrderItemResponse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -15,7 +15,7 @@ public interface OrderItemsRepository extends JpaRepository<OrderItems, UUID> {
     List<OrderItems> findAllByOrderId(UUID orderId);
 
     @Query("""
-            SELECT new com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model.SellerOrderItemResponse(o, oi)
+            SELECT new com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto.SellerOrderItemResponse(o, oi)
               FROM OrderItems oi, Orders o, Product p, Seller s, Users u
              WHERE oi.orderId = o.orderId
                AND oi.productId = p.productId
@@ -31,7 +31,7 @@ public interface OrderItemsRepository extends JpaRepository<OrderItems, UUID> {
     boolean existsByOrderIdAndProductIdIn(UUID orderId, List<UUID> productIds);
 
     @Query("""
-            SELECT new com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model.SellerOrderItemResponse(o, oi)
+            SELECT new com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto.SellerOrderItemResponse(o, oi)
               FROM OrderItems oi, Orders o, Product p, Seller s, Users u
              WHERE oi.orderId = o.orderId
                AND oi.productId = p.productId

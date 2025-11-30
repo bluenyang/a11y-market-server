@@ -1,8 +1,11 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ImageMetadata;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.util.List;
 
 public record SellerProductRegisterRequest(
         @NotBlank
@@ -20,5 +23,7 @@ public record SellerProductRegisterRequest(
 
         @NotNull
         @Min(0) Integer
-        productStock) {
+        productStock,
+
+        List<ImageMetadata> imageMetadataList) {
 }

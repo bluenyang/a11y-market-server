@@ -1,4 +1,4 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity;
 
 import lombok.Getter;
 

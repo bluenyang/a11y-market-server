@@ -17,8 +17,30 @@ spring:
   open-in-view: false
   # AI model configuration
   ai:
-    model:
-      chat: none # disable AI features because not implemented yet
+    vertex:
+      ai:
+        gemini:
+          project-id: your-project-id
+          location: your-location(e.g., asia-northeast3)
+          chat:
+            options:
+              model: gemini-2.5-flash
+  # AWS S3 (or MinIO) configuration
+  cloud:
+    aws:
+      region:
+        static: user-region
+      credentials:
+        access-key: "user-access-key"
+        secret-key: "user-secret-key"
+      s3:
+        endpoint: "your-bucket-endpoint"
+        path-style-access-enabled: true
+
+# S3(MinIO) bucket configuration
+app:
+  s3:
+    bucket: bucket-name
 
 # Server configuration
 server:

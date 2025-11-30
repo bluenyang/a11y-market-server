@@ -1,5 +1,6 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Product;
 import lombok.*;
 
 import java.util.UUID;

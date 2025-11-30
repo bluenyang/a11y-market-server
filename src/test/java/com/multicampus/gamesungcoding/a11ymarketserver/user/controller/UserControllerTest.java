@@ -2,11 +2,13 @@ package com.multicampus.gamesungcoding.a11ymarketserver.user.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.CorsProperties;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.controller.UserController;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.UserResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -20,6 +22,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @Import(SecurityConfig.class)
 @WebMvcTest(UserController.class)
+@EnableConfigurationProperties(CorsProperties.class)
 class UserControllerTest {
     @Autowired
     private MockMvc mockMvc;

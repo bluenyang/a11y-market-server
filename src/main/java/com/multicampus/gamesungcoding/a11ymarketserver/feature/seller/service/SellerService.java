@@ -1,35 +1,60 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.service;
 
+import com.github.f4b6a3.uuid.alt.GUID;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataDuplicatedException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotFoundException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidRequestException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.UserNotFoundException;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.S3StorageProperties;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.Orders;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrderItemsRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrdersRepository;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.Product;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductDTO;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model.ProductStatus;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ImageMetadata;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDetailResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Product;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductAiSummary;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductImages;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductStatus;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductAiSummaryRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductImagesRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model.*;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto.*;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.Seller;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.SellerGrades;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.SellerSales;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.SellerSubmitStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.repository.SellerRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.repository.SellerSalesRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.model.Users;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.util.gemini.service.ProductAnalysisService;
+import io.awspring.cloud.s3.S3Template;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional
 public class SellerService {
+
+    private final S3Template s3Template;
+    private final S3StorageProperties s3StorageProperties;
 
     private final SellerRepository sellerRepository;
     private final ProductRepository productRepository;
@@ -37,6 +62,9 @@ public class SellerService {
     private final OrdersRepository ordersRepository;
     private final OrderItemsRepository orderItemsRepository;
     private final SellerSalesRepository sellerSalesRepository;
+    private final ProductImagesRepository productImagesRepository;
+    private final ProductAnalysisService productAnalysisService;
+    private final ProductAiSummaryRepository productAiSummaryRepository;
 
     public SellerApplyResponse applySeller(String userEmail, SellerApplyRequest request) {
         Users user = userRepository.findByUserEmail(userEmail)
@@ -70,7 +98,9 @@ public class SellerService {
                 saved.getApprovedDate());
     }
 
-    public ProductDTO registerProduct(String userEmail, SellerProductRegisterRequest request) {
+    public ProductDetailResponse registerProduct(String userEmail,
+                                                 SellerProductRegisterRequest request,
+                                                 List<MultipartFile> images) {
 
         Seller seller = sellerRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new DataNotFoundException("판매자 정보가 존재하지 않습니다. 먼저 판매자 가입 신청을 완료하세요."));
@@ -92,7 +122,32 @@ public class SellerService {
                 .productStatus(ProductStatus.PENDING)
                 .build();
 
-        return ProductDTO.fromEntity(productRepository.save(product));
+
+        product = productRepository.save(product);
+
+        if (images == null || images.isEmpty() || request.imageMetadataList() == null) {
+            return ProductDetailResponse.fromEntity(product, null, null);
+        }
+
+        List<ProductImages> savedImages = saveImageWithMetadata(
+                images,
+                request.imageMetadataList(),
+                sellerId,
+                product.getProductId()
+        );
+
+        return ProductDetailResponse.fromEntity(
+                productRepository.save(product),
+                savedImages,
+                productAiSummaryRepository.save(
+                        createAiSummaryForProduct(
+                                product.getProductId(),
+                                product.getProductName(),
+                                product.getProductDescription(),
+                                images
+                        )
+                )
+        );
     }
 
     @Transactional(readOnly = true)
@@ -260,9 +315,8 @@ public class SellerService {
                     throw new InvalidRequestException("SHIPPED 상태에서는 DELIVERED로만 변경할 수 있습니다.");
                 }
             }
-            default -> {
-                throw new InvalidRequestException("현재 주문 상태에서는 판매자가 상태를 변경할 수 없습니다.");
-            }
+            default -> throw new InvalidRequestException("현재 주문 상태에서는 판매자가 상태를 변경할 수 없습니다.");
+
         }
     }
 
@@ -297,7 +351,8 @@ public class SellerService {
         if ("APPROVE".equals(action)) {
             if (currentStatus == OrderItemStatus.CANCEL_PENDING) {
                 orderItem.updateOrderItemStatus(OrderItemStatus.CANCELED);
-            } else if (currentStatus == OrderItemStatus.RETURN_PENDING) {
+            } else {
+                // 위에서 이미 걸러 냈기 때문에 else if 문은 필요하지 않음
                 orderItem.updateOrderItemStatus(OrderItemStatus.RETURNED);
             }
         } else if ("REJECT".equals(action)) {
@@ -345,7 +400,7 @@ public class SellerService {
         int totalOrders = sales != null && sales.getTotalOrders() != null ? sales.getTotalOrders() : 0;
         int totalProductsSold = sales != null && sales.getTotalProductsSold() != null ? sales.getTotalProductsSold() : 0;
         int totalCancelled = sales != null && sales.getTotalCancelled() != null ? sales.getTotalCancelled() : 0;
-        
+
         return new SellerDashboardResponse(
                 seller.getSellerId(),
                 seller.getSellerName(),
@@ -354,5 +409,71 @@ public class SellerService {
                 totalProductsSold,
                 totalCancelled
         );
+    }
+
+    private List<ProductImages> saveImageWithMetadata(List<MultipartFile> images,
+                                                      List<ImageMetadata> metadataList,
+                                                      UUID sellerId,
+                                                      UUID productId) {
+        Map<String, MultipartFile> fileMap = images.stream()
+                .collect(Collectors.toMap(MultipartFile::getOriginalFilename, Function.identity()));
+
+        List<ProductImages> savedImages = new ArrayList<>();
+
+        for (var meta : metadataList) {
+            var image = fileMap.get(meta.originalFileName());
+
+            String imageUrl = uploadImageToS3(image, sellerId, productId);
+            var savedImg = productImagesRepository.save(
+                    ProductImages.builder()
+                            .productId(productId)
+                            .imageUrl(imageUrl)
+                            .altText(meta.altText())
+                            .imageSequence(meta.sequence())
+                            .build()
+            );
+
+            savedImages.add(savedImg);
+        }
+
+        return savedImages;
+    }
+
+    private String uploadImageToS3(MultipartFile image, UUID sellerId, UUID productId) {
+        if (image.isEmpty()) {
+            return null;
+        }
+        // 파일 위치 => /images/{sellerId}/{productId}/{생성된 UUID}.format 으로 저장
+        String folder = "images/" + sellerId + "/" + productId;
+
+        // unique한 파일명 생성
+        String originalFilename = image.getOriginalFilename();
+        UUID fileId = GUID.v7().toUUID();
+        String uniqueFileName = folder + "/" + fileId + "_" + originalFilename;
+
+        try {
+            String bucketName = s3StorageProperties.getBucket();
+            s3Template.upload(bucketName,
+                    uniqueFileName,
+                    image.getInputStream());
+
+            return "/" + bucketName + "/" + uniqueFileName;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private ProductAiSummary createAiSummaryForProduct(UUID productId,
+                                                       String productName,
+                                                       String productDescription,
+                                                       List<MultipartFile> images) {
+
+        var result = productAnalysisService.analysisProductImage(productName, productDescription, images);
+        return ProductAiSummary.builder()
+                .productId(productId)
+                .summaryText(result.summary())
+                .usageContext(result.usageContext())
+                .usageMethod(result.usageMethod())
+                .build();
     }
 }

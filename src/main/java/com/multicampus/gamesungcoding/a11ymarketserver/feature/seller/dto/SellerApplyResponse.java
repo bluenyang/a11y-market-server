@@ -1,4 +1,6 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.model;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto;
+
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.Seller;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

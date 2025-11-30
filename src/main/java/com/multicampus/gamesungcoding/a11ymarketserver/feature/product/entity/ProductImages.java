@@ -1,4 +1,4 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.model;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7;
 import jakarta.persistence.*;
@@ -29,19 +29,25 @@ public class ProductImages {
     private String imageUrl;
 
     @Lob
+    @Column(columnDefinition = "CLOB")
     private String altText;
 
     @CreatedDate
     private LocalDateTime createdAt;
 
+    @Column(nullable = false)
+    private Integer imageSequence;
+
     @Builder
     private ProductImages(
             UUID productId,
             String imageUrl,
-            String altText) {
+            String altText,
+            Integer imageSequence) {
 
         this.productId = productId;
         this.imageUrl = imageUrl;
         this.altText = altText;
+        this.imageSequence = imageSequence;
     }
 }
