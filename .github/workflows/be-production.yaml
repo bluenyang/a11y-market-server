@@ -1,8 +1,10 @@
-name: BE | Staging - Build and Deploy
+name: BE | Production - Build and Deploy
 on:
   push:
     branches:
-      - develop # when pushed on develop
+      - master
+    tags:
+      - 'v*.*.*'
   workflow_dispatch:
 
 env:
@@ -11,12 +13,12 @@ env:
   # Fixed value for staging
   IMAGE_TAG: ghcr.io/${{ secrets.GHCR_USER }}/${{ github.event.repository.name }}:develop
   SERVICE_NAME: be-staging
-  DEPLOY_PATH: ${{ secrets.AWS_DOCKER_DIR }}/deployments/be-staging
+  DEPLOY_PATH: ${{ secrets.DOCKER_DIR }}/deployments/be-staging
 
 jobs:
   build-and-push:
     name: Build, Test and Push Image
-    runs-on: [ self-hosted, be, staging ]
+    runs-on: [ self-hosted, be, prod ]
 
     steps:
       - name: Checkout code
@@ -67,7 +69,7 @@ jobs:
   deploy:
     name: Deploy to Staging Server
     needs: build-and-push
-    runs-on: [ self-hosted, be, staging ]
+    runs-on: self-hosted
 
     # Set output and secrets received through needs as global variables
     env:

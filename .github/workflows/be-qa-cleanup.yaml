@@ -13,7 +13,7 @@ on:
 jobs:
   cleanup:
     name: Cleanup PR Deployment
-    runs-on: self-hosted
+    runs-on: [ self-hosted, be, qa ]
 
     steps:
       - name: Set dynamic variables
@@ -28,18 +28,18 @@ jobs:
       - name: Cleanup server resources via SSH
         run: |
           export SERVICE_NAME=${{ steps.vars.outputs.service_name }}
-          export DEPLOY_PATH=${{ secrets.DOCKER_DIR }}/deployments/$SERVICE_NAME
+          export DEPLOY_PATH=${{ secrets.AWS_DOCKER_DIR }}/deployments/$SERVICE_NAME
 
           echo "[LOG] Attempting to cleanup project: $SERVICE_NAME"
           # Attempt to stop and remove with container name and fallback
           docker stop "$SERVICE_NAME" || echo "[LOG] Container $SERVICE_NAME not found or already stopped."
           docker rm "$SERVICE_NAME" || echo "[LOG] Container $SERVICE_NAME not found or already removed."
-            
+          
           if [ -d "$DEPLOY_PATH" ]; then
             echo "[LOG] Removing deployment directory: $DEPLOY_PATH"
             rm -rf "$DEPOLY_PATH"
           else
             echo "[LOG] Deployment directory not found: $DEPLOY_PATH"
           fi
-            
+          
           echo "[LOG] Cleanup for $SERVICE_NAME finished"
