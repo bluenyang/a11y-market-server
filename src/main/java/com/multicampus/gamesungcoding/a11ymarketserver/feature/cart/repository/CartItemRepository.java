@@ -15,20 +15,7 @@ public interface CartItemRepository extends JpaRepository<CartItems, UUID> {
 
     Optional<CartItems> findByCartAndProduct_ProductId(Cart cart, UUID productId);
 
-    @Query("""
-            SELECT ci
-            FROM CartItems ci
-            WHERE ci.cartId = (
-                SELECT c.cartId
-                FROM Cart c
-                WHERE c.userId = (
-                    SELECT u.userId
-                    FROM Users u
-                    WHERE u.userEmail = :email
-                )
-            )
-            """)
-    List<CartItems> findByUserEmail(@Param("email") String userEmail);
+    List<CartItems> findByCart_User_UserEmail(String userEmail);
 
     @Query("""
             SELECT new com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartItemDto(
@@ -59,4 +46,6 @@ public interface CartItemRepository extends JpaRepository<CartItems, UUID> {
             )
             """)
     List<CartItemDto> findAllByUserEmailToResponse(@Param("email") String userEmail);
+
+    List<CartItems> findAllByCart_User_UserEmail(String userEmail);
 }

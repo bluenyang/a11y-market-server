@@ -29,7 +29,10 @@ public class CartService {
     private final ProductRepository productRepository;
 
     public CartItemListResponse getCartItems(String UserEmail) {
-        var list = cartItemRepository.findAllByUserEmailToResponse(UserEmail);
+        // var list = cartItemRepository.findAllByUserEmailToResponse(UserEmail);
+        var list = cartItemRepository.findAllByCart_User_UserEmail(UserEmail).stream()
+                .map(CartItemDto::fromEntity)
+                .toList();
         int total = list.stream()
                 .mapToInt(item -> item.quantity() * item.productPrice())
                 .sum();
@@ -126,7 +129,7 @@ public class CartService {
         Users user = userRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + userEmail));
 
-        return cartRepository.findByUserId(user.getUserId())
+        return cartRepository.findByUser(user)
                 .orElseGet(() -> cartRepository
                         .save(Cart
                                 .builder()

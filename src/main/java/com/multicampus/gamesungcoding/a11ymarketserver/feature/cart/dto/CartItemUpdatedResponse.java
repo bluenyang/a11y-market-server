@@ -14,8 +14,8 @@ public record CartItemUpdatedResponse(
 
         return new CartItemUpdatedResponse(
                 cartItems.getCartItemId(),
-                cartItems.getCartId(),
-                cartItems.getProductId(),
+                cartItems.getCart().getCartId(),
+                cartItems.getProduct().getProductId(),
                 cartItems.getQuantity()
         );
     }
