@@ -238,7 +238,7 @@ public class OrderService {
         }
 
         item.updateOrderItemStatus(OrderItemStatus.CONFIRMED);
-
+        /* orderStatus가 더 이상 사용되지 않으므로 주석 처리
         // 주문 상태 전체 갱신
         var allItems = orderItemsRepository.findAllByOrder_OrderId(orderUuid);
 
@@ -246,9 +246,9 @@ public class OrderService {
                 .anyMatch(i -> i.getOrderItemStatus() != OrderItemStatus.CONFIRMED
                         && i.getOrderItemStatus() != OrderItemStatus.CANCELED);
 
-        // if (!hasNotFinishedItem) {
-        //     order.updateOrderItemStatus(OrderStatus.SHIPPED);
-        // }
+        if (!hasNotFinishedItem) {
+            order.updateOrderItemStatus(OrderStatus.SHIPPED);
+        }*/
     }
 
     // 결제 검증

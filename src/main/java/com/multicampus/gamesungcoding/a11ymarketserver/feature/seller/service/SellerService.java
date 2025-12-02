@@ -9,7 +9,6 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.S3Stora
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrderItemsRepository;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrdersRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ImageMetadata;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDTO;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDetailResponse;
@@ -55,7 +54,6 @@ public class SellerService {
     private final SellerRepository sellerRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
-    private final OrdersRepository ordersRepository;
     private final OrderItemsRepository orderItemsRepository;
     private final SellerSalesRepository sellerSalesRepository;
     private final ProductImagesRepository productImagesRepository;
