@@ -7,6 +7,5 @@ public record AdminSellerUpdateRequest(
         String businessNumber,
         SellerGrades sellerGrade,
         String sellerIntro,
-        Boolean a11yGuarantee
-) {
+        Boolean a11yGuarantee) {
 }

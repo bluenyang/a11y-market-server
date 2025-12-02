@@ -130,11 +130,9 @@ public class CartService {
                 .orElseThrow(() -> new UserNotFoundException("User not found: " + userEmail));
 
         return cartRepository.findByUser(user)
-                .orElseGet(() -> cartRepository
-                        .save(Cart
-                                .builder()
-                                .user(user)
-                                .build())
+                .orElseGet(() -> cartRepository.save(Cart.builder()
+                        .user(user)
+                        .build())
                 );
     }
 

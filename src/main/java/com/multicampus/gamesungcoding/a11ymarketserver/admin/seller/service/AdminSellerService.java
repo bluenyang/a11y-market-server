@@ -25,7 +25,7 @@ public class AdminSellerService {
 
     public List<SellerApplyResponse> inquirePendingSellers() {
 
-        List<Seller> pendingList = sellerRepository.findBySellerSubmitStatus(SellerSubmitStatus.PENDING.getStatus());
+        List<Seller> pendingList = sellerRepository.findAllBySellerSubmitStatus(SellerSubmitStatus.PENDING);
 
         return pendingList.stream()
                 .map(SellerApplyResponse::fromEntity)
@@ -59,7 +59,7 @@ public class AdminSellerService {
                 request.sellerName(),
                 request.businessNumber(),
                 request.sellerIntro(),
-                request.sellerGrade() != null ? request.sellerGrade().getGrade() : null,
+                request.sellerGrade() != null ? request.sellerGrade() : null,
                 request.a11yGuarantee()
         );
     }

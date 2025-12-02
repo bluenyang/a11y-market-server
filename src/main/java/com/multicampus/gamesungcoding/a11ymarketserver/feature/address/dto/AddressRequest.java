@@ -1,4 +1,4 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.address.dto;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -20,5 +20,7 @@ public record AddressRequest(
         String receiverAddr1,
 
         @Size(max = 200, message = "상세 주소는 200자 이하여야 합니다.")
-        String receiverAddr2) {
+        String receiverAddr2,
+        
+        Boolean isDefault) {
 }

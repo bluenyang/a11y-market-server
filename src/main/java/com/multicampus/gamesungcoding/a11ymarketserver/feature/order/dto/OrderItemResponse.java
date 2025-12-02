@@ -21,7 +21,7 @@ public record OrderItemResponse(
 
         return new OrderItemResponse(
                 entity.getOrderItemId(),
-                entity.getProductId(),
+                entity.getProduct().getProductId(),
                 entity.getProductName(),
                 entity.getProductPrice(),
                 entity.getProductQuantity(),

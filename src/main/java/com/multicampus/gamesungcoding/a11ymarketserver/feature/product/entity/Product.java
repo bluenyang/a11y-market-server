@@ -3,7 +3,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.Seller;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,6 +15,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,9 +29,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "products")
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Product {
 
@@ -40,7 +39,7 @@ public class Product {
     private UUID productId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false, updatable = false)
+    @JoinColumn(name = "seller_id", updatable = false)
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Seller seller;
 
@@ -82,9 +81,27 @@ public class Product {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Builder.Default
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductImages> productImages;
+
+    @Builder
+    public Product(Seller seller,
+                   Categories category,
+                   Integer productPrice,
+                   Integer productStock,
+                   String productName,
+                   String productDescription,
+                   ProductStatus productStatus) {
+
+        this.seller = seller;
+        this.category = category;
+        this.productPrice = productPrice;
+        this.productStock = productStock;
+        this.productName = productName;
+        this.productDescription = productDescription;
+        this.productStatus = productStatus;
+        this.productImages = new ArrayList<>();
+    }
 
     /* === 의도 메서드 === */
     public void changeProductName(String newProductName) {
@@ -101,6 +118,9 @@ public class Product {
 
     public void changeStatus(ProductStatus newStatus) {
         this.productStatus = newStatus;
+        if (newStatus.isApproved()) {
+            this.approvedDate = LocalDateTime.now();
+        }
     }
 
     /**

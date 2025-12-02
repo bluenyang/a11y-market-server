@@ -1,6 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.order.dto;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.AddressResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.dto.AddressResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderCheckoutStatus;
 
 import java.util.List;

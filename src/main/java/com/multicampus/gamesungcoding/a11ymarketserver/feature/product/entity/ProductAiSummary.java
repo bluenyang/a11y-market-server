@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Getter
 @Entity
@@ -20,6 +21,10 @@ import java.time.LocalDateTime;
 public class ProductAiSummary {
 
     @Id
+    @Column
+    private UUID productId;
+
+    @MapsId
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", updatable = false, nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

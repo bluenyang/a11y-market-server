@@ -1,6 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Product;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductStatus;
 import lombok.*;
 
 import java.util.UUID;
@@ -19,14 +20,14 @@ public class ProductDTO {
     private UUID productId;
     private String productName;
     private Integer productPrice;
-    private String productStatus;
+    private ProductStatus productStatus;
 
     public static ProductDTO fromEntity(Product entity) {
         return ProductDTO.builder()
                 .productId(entity.getProductId())
                 .productName(entity.getProductName())
                 .productPrice(entity.getProductPrice())
-                .productStatus(entity.getProductStatus().getStatus())
+                .productStatus(entity.getProductStatus())
                 .build();
     }
 }

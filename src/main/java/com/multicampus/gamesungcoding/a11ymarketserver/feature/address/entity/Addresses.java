@@ -1,4 +1,4 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.address.entity;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.Users;
@@ -33,18 +33,26 @@ public class Addresses {
     @Embedded
     private AddressInfo address;
 
+    @Column(nullable = false)
+    private Boolean isDefault;
+
     @CreatedDate
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
     @Builder
-    private Addresses(Users user, AddressInfo addressInfo) {
+    private Addresses(Users user, AddressInfo addressInfo, Boolean isDefault) {
         this.user = user;
         this.address = addressInfo;
+        this.isDefault = isDefault;
     }
 
     // 배송지 정보 수정
     public void updateAddrInfo(AddressInfo addressInfo) {
         this.address = addressInfo;
+    }
+
+    public void setDefault(Boolean isDefault) {
+        this.isDefault = isDefault;
     }
 }

@@ -1,8 +1,8 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.address.controller;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.AddressRequest;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.AddressResponse;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.DefaultAddressRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.dto.AddressRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.dto.AddressResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.dto.DefaultAddressRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.service.AddressService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

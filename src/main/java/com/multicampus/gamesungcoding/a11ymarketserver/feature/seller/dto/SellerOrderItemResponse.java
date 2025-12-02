@@ -1,7 +1,8 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.Orders;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,27 +14,27 @@ public record SellerOrderItemResponse(
         String productName,
         int productPrice,
         int productQuantity,
-        String orderItemStatus,
-        String orderStatus,
+        OrderItemStatus orderItemStatus,
+        OrderStatus orderStatus,
         String buyerName,
         String buyerEmail,
         String buyerPhone,
         LocalDateTime orderedAt
 ) {
-    public SellerOrderItemResponse(Orders order, OrderItems item) {
-        this(
+    public static SellerOrderItemResponse fromEntity(OrderItems item) {
+        return new SellerOrderItemResponse(
                 item.getOrderItemId(),
-                order.getOrderId(),
-                item.getProductId(),
+                item.getOrder().getOrderId(),
+                item.getProduct().getProductId(),
                 item.getProductName(),
                 item.getProductPrice(),
                 item.getProductQuantity(),
-                item.getOrderItemStatus().name(),
-                order.getOrderStatus().name(),
-                order.getUserName(),
-                order.getUserEmail(),
-                order.getUserPhone(),
-                order.getCreatedAt()
+                item.getOrderItemStatus(),
+                item.getOrder().getOrderStatus(),
+                item.getOrder().getUserName(),
+                item.getOrder().getUserEmail(),
+                item.getOrder().getUserPhone(),
+                item.getOrder().getCreatedAt()
         );
     }
 }

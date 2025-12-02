@@ -1,7 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.user.service;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.AddressInfo;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.Addresses;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.entity.AddressInfo;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.entity.Addresses;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.repository.AddressRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.Cart;

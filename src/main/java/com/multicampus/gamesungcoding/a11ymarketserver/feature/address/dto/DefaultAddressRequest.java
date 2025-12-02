@@ -1,4 +1,4 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.address.dto;
 
 import jakarta.validation.constraints.NotNull;
 

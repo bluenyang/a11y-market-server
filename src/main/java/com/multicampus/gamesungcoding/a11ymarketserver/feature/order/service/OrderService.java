@@ -2,10 +2,9 @@ package com.multicampus.gamesungcoding.a11ymarketserver.feature.order.service;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotFoundException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidRequestException;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.AddressResponse;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.model.Addresses;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.dto.AddressResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.entity.Addresses;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.repository.AddressRepository;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.repository.DefaultAddressRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.Cart;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.CartItems;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.repository.CartItemRepository;
@@ -33,7 +32,6 @@ import java.util.UUID;
 public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final AddressRepository addressRepository;
-    private final DefaultAddressRepository defaultAddressRepository;
     private final OrdersRepository ordersRepository;
     private final OrderItemsRepository orderItemsRepository;
     private final ProductImagesRepository productImagesRepository;
@@ -69,7 +67,11 @@ public class OrderService {
             throw new DataNotFoundException("사용 가능한 배송지가 없습니다.");
         }
 
-        var defaultAddress = defaultAddressRepository.findByUser_UserEmail(userEmail);
+        var defaultAddress = addresses
+                .stream()
+                .filter(Addresses::getIsDefault)
+                .findFirst()
+                .orElse(addresses.getFirst()); // 기본 배송지가 없으면 첫 번째 주소 사용
 
         // 최종 반환
         return new OrderCheckoutResponse(

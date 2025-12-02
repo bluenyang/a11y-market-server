@@ -5,4 +5,8 @@ public enum ProductStatus {
     APPROVED,
     REJECTED,
     DELETED;
+
+    public boolean isApproved() {
+        return this == APPROVED;
+    }
 }

@@ -84,7 +84,7 @@ class SellerProductServiceTest {
                 .sellerId(sellerId)
                 .sellerSubmitStatus("APPROVED")
                 .build();
-        BDDMockito.when(sellerRepository.findByUserEmail(email))
+        BDDMockito.when(sellerRepository.findByUser_UserEmail(email))
                 .thenReturn(Optional.of(seller));
 
         var product = Product.builder()
@@ -145,7 +145,7 @@ class SellerProductServiceTest {
         var seller = Seller.builder()
                 .sellerSubmitStatus("PENDING")
                 .build();
-        BDDMockito.when(sellerRepository.findByUserEmail(email))
+        BDDMockito.when(sellerRepository.findByUser_UserEmail(email))
                 .thenReturn(Optional.of(seller));
 
         Assertions.assertThrows(InvalidRequestException.class, () ->
