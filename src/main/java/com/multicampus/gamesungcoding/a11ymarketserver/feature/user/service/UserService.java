@@ -5,8 +5,8 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.UserNotF
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrderItemsRepository;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Product;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.service.SellerService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserDeleteRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserUpdateRequest;
@@ -14,9 +14,11 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.UserR
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -27,6 +29,7 @@ public class UserService {
     private final AuthService authService;
     private final OrderItemsRepository orderItemsRepository;
     private final ProductRepository productRepository;
+    private final SellerService sellerService;
 
     // 마이페이지 - 회원 정보 조회
     public UserResponse getUserInfo(String userEmail) {
@@ -65,9 +68,12 @@ public class UserService {
             }
 
             // 모든 Product를 논리적으로 삭제 처리
-            productRepository.findAllBySeller_User_UserEmail(userEmail)
-                    .forEach(Product::deleteProduct);
+            sellerService.deleteProducts(
+                    userEmail,
+                    productRepository.findAllBySeller_User_UserEmail(userEmail));
         }
+
+        log.info("Deleting user with email: {}", userEmail);
 
         authService.logout(userEmail);
 
