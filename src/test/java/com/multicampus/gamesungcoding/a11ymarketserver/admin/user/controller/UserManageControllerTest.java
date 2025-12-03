@@ -3,6 +3,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.admin.user.controller;
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.user.service.AdminUserManageService;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.oauth.OAuth2LoginSuccessHandler;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.CorsProperties;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.UserRole;
@@ -36,6 +37,8 @@ class UserManageControllerTest {
     private JwtTokenProvider jwtTokenProvider;
     @MockitoBean
     private AdminUserManageService service;
+    @MockitoBean
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Test
     @WithMockUser

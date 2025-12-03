@@ -5,6 +5,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityCon
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataDuplicatedException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.service.RefreshTokenService;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.oauth.OAuth2LoginSuccessHandler;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.CorsProperties;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.controller.AuthController;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequest;
@@ -50,6 +51,8 @@ class AuthControllerTest {
     private RefreshTokenService refreshTokenService;
     @MockitoBean
     private AuthenticationManager authenticationManager;
+    @MockitoBean
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Autowired
     private ObjectMapper objectMapper;

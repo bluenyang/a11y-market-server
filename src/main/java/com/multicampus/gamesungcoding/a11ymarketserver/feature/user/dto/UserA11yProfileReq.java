@@ -1,4 +1,4 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto;
 
 import jakarta.validation.constraints.*;
 

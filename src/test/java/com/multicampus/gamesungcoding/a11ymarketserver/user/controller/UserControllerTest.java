@@ -3,6 +3,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.config.SecurityConfig;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.oauth.OAuth2LoginSuccessHandler;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.CorsProperties;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.controller.UserController;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserDeleteRequest;
@@ -38,6 +39,8 @@ class UserControllerTest {
     private JwtTokenProvider jwtTokenProvider;
     @MockitoBean
     private UserService userService;
+    @MockitoBean
+    private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Test
     @WithMockUser(username = "user1@example.com")

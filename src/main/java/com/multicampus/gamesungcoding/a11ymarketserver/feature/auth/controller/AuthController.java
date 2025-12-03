@@ -3,6 +3,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.controller;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.dto.JwtResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.dto.RefreshRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.KakaoSignUpRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.UUID;
 
 @Slf4j
 @RestController
@@ -66,6 +68,28 @@ public class AuthController {
         return ResponseEntity
                 .created(URI.create("/api/v1/users/me"))
                 .body(authService.join(dto));
+    }
+
+    @PostMapping("/v1/auth/kakao-join")
+    @ResponseStatus(HttpStatus.CREATED)
+    public ResponseEntity<UserResponse> kakaoJoin(
+            @AuthenticationPrincipal UserDetails principal,
+            @RequestBody KakaoSignUpRequest dto) {
+
+        var userOauthLinkId = UUID.fromString(principal.getUsername());
+
+        return ResponseEntity
+                .created(URI.create("/api/v1/users/me"))
+                .body(authService.kakaoJoin(userOauthLinkId, dto));
+    }
+
+    @GetMapping("/v1/auth/me/info")
+    public ResponseEntity<LoginResponse> getLoginUserInfo(
+            @AuthenticationPrincipal UserDetails userDetails) {
+
+        var response = authService.getUserInfo(
+                UUID.fromString(userDetails.getUsername()));
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/v1/auth/check-email")

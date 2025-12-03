@@ -1,6 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.JwtProperties;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.UserRole;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
@@ -16,6 +17,7 @@ import javax.crypto.SecretKey;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -37,12 +39,20 @@ public class JwtTokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
 
-        var now = new Date();
-        var expiryDate = new Date(now.getTime() + accessTokenValidityMs);
+        return createToken(authentication.getName(), authorities);
+    }
+
+    public String createAccessToken(UUID userId, UserRole role) {
+        return createToken(userId.toString(), role.name());
+    }
+
+    public String createTemporaryAccessToken(UUID uuid) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + 15 * 60 * 1000); // 15 minutes
 
         return Jwts.builder()
-                .subject(authentication.getName())
-                .claim("auth", authorities)
+                .subject(uuid.toString())
+                .claim("auth", UserRole.TEMP)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(secretKey)
@@ -79,5 +89,18 @@ public class JwtTokenProvider {
             log.debug("JwtTokenProvider.getAuthentication - JWT token validation error: {}", e.getMessage());
         }
         return false;
+    }
+
+    private String createToken(String subject, String role) {
+        var now = new Date();
+        var expiryDate = new Date(now.getTime() + accessTokenValidityMs);
+
+        return Jwts.builder()
+                .subject(subject)
+                .claim("auth", role)
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(secretKey)
+                .compact();
     }
 }

@@ -16,15 +16,54 @@ spring:
         format_sql: true
     open-in-view: false
   ai:
-    model:
-      chat: none
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    vertex:
+      ai:
+        gemini:
+          project-id: your-project-id
+          location: asia-northeast3
+          chat:
+            options:
+              model: gemini-2.5-flash
+  cloud:
+    aws:
+      region:
+        static: us-east-1
+      credentials:
+        access-key: "minioadmin"
+        secret-key: "minioadmin"
+      s3:
+        endpoint: "https://youtube-minio.domain.com"
+        path-style-access-enabled: true
+  security:
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: your-client-id
+            client-secret: your-client-secret
+            client-name: Kakao
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            authorization-grant-type: authorization_code
+            client-authentication-method: client_secret_post
+
+        provider:
+          kakao:
+            authorization-uri: https://kauth.kakao.com/oauth/authorize
+            token-uri: https://kauth.kakao.com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
+oauth2:
+  redirect-uri: http://localhost:5173/auth/oauth-redirect
+  signup-uri: http://localhost:5173/auth/oauth-signup
+
+app:
+  s3:
+    bucket: a11ymarket-bucket
 
 server:
   port: 8080
+  forward-headers-strategy: framework
 
 management:
   endpoints:
@@ -35,4 +74,22 @@ management:
 logging:
   level:
     root: INFO
-    com.multicampus.gamesungcoding.a11ymarketserver: DEBUG
+    com:
+      multicampus:
+        gamesungcoding:
+          a11ymarketserver: DEBUG
+
+cors:
+  allowed-origin-patterns:
+    - "http://localhost:8080"
+    - "http://localhost:5173"
+
+jwt:
+  secret: xmIU9etA4t7VUzRG5k9iPjd8rsH+hBP50hfqyduxOSS8RJIyRzWLDkXiUK0dTKJKTx63hqBFMAzZoy/ScH68Gg==
+  access-token-validity-ms: 1800000
+  refresh-token-validity-ms: 604800000
+
+# Swagger configuration
+springdoc:
+  api-docs:
+    enabled: true

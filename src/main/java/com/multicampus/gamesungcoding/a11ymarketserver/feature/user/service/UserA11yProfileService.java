@@ -3,6 +3,8 @@ package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.service;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotFoundException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidRequestException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.UserNotFoundException;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserA11yProfileReq;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserA11yProfileResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.*;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserA11yProfileRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;

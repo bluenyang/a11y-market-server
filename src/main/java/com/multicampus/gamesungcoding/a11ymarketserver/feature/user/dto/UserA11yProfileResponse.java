@@ -1,4 +1,6 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto;
+
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.UserA11yProfile;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

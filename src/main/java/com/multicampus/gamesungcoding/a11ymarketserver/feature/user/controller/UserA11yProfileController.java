@@ -1,8 +1,8 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidRequestException;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.UserA11yProfileReq;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.UserA11yProfileResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserA11yProfileReq;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserA11yProfileResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.service.UserA11yProfileService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

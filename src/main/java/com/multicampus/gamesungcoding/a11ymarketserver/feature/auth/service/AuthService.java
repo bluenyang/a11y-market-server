@@ -8,11 +8,13 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.dto.JwtRespons
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.provider.JwtTokenProvider;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.service.RefreshTokenService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.KakaoSignUpRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.UserRole;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.Users;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserOauthLinksRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -20,9 +22,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -34,6 +42,7 @@ public class AuthService {
     private final UserDetailsService userDetailsService;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final UserOauthLinksRepository userOauthLinksRepository;
 
     public LoginResponse login(LoginRequest dto) {
 
@@ -72,6 +81,27 @@ public class AuthService {
         );
     }
 
+    public LoginResponse getUserInfo(UUID userId) {
+        Users user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("유효하지 않은 사용자입니다."));
+
+        List<GrantedAuthority> authorities = Collections.singletonList(
+                new SimpleGrantedAuthority(user.getUserRole().name())
+        );
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(
+                user.getUserEmail(),
+                null,
+                authorities
+        );
+
+        return LoginResponse.fromEntityAndTokens(
+                user,
+                jwtTokenProvider.createAccessToken(authentication),
+                refreshTokenService.createRefreshToken(authentication)
+        );
+    }
+
     @Transactional
     public JwtResponse reissueToken(String refreshToken) {
 
@@ -88,6 +118,7 @@ public class AuthService {
         return new JwtResponse(newAccessToken, refreshToken);
     }
 
+    @Transactional
     public UserResponse join(JoinRequest dto) {
 
         // 이메일 중복 체크
@@ -109,7 +140,32 @@ public class AuthService {
         return UserResponse.fromEntity(userRepository.save(user));
     }
 
-    //이메일 중복 체크 API용
+    @Transactional
+    public UserResponse kakaoJoin(UUID userOauthLinkId, KakaoSignUpRequest dto) {
+        if (userRepository.existsByUserEmail(dto.userEmail())) {
+            throw new DataDuplicatedException("이미 존재하는 이메일입니다.");
+        }
+
+        var oauthLink = userOauthLinksRepository.findById(userOauthLinkId)
+                .orElseThrow(() -> new DataNotFoundException("OAuth link not found for ID: " + userOauthLinkId));
+        if (oauthLink.getUser() != null) {
+            throw new InvalidRequestException("이미 가입된 OAuth 링크입니다.");
+        }
+
+        Users user = userRepository.save(
+                Users.builder()
+                        .userEmail(dto.userEmail())
+                        .userName(dto.userName())
+                        .userNickname(dto.userNickname())
+                        .userRole(UserRole.USER)
+                        .build());
+        oauthLink.updateUser(user);
+        oauthLink = userOauthLinksRepository.save(oauthLink);
+
+        return UserResponse.fromEntity(oauthLink.getUser());
+    }
+
+    // 이메일 중복 체크 API용
     public boolean isEmailDuplicate(String email) {
         return userRepository.existsByUserEmail(email);
     }

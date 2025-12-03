@@ -8,6 +8,5 @@ public record SellerDashboardResponse(
         int totalSales,
         int totalOrders,
         int totalProductsSold,
-        int totalCancelled
-) {
+        int totalCancelled) {
 }
