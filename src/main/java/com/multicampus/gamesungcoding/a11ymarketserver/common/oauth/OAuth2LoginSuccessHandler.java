@@ -40,14 +40,12 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 (Map<String, Object>) kakaoAccount.get("profile");
 
         Long kakaoId = (Long) attributes.get("id");
-        String email = (String) kakaoAccount.get("email");
         String nickname = (String) profile.get("nickname");
 
         var oauthLink = userOauthLinksRepository.findByOauthProviderId(String.valueOf(kakaoId))
                 .orElseGet(() -> {
                     var user = userRepository.save(
                             Users.builder()
-                                    .userEmail(email)
                                     .userNickname(nickname)
                                     .build());
 
@@ -60,13 +58,23 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 });
 
         var user = oauthLink.getUser();
-        String jwt = jwtTokenProvider.createAccessToken(user.getUserId(), user.getUserRole());
+        String targetUrl;
 
-        String targetUrl = UriComponentsBuilder.fromUriString(oAuth2Properties.getRedirectUri())
-                .queryParam("token", jwt)
-                .build()
-                .encode(StandardCharsets.UTF_8)
-                .toUriString();
+        if (user.getUserName() == null || user.getUserPhone() == null) {
+            String tempJwt = jwtTokenProvider.createTemporaryAccessToken(user.getUserId());
+            targetUrl = UriComponentsBuilder.fromUriString(oAuth2Properties.getSignupUri())
+                    .queryParam("temp_token", tempJwt)
+                    .build()
+                    .encode(StandardCharsets.UTF_8)
+                    .toUriString();
+        } else {
+            String jwt = jwtTokenProvider.createAccessToken(user.getUserId(), user.getUserRole());
+            targetUrl = UriComponentsBuilder.fromUriString(oAuth2Properties.getRedirectUri())
+                    .queryParam("token", jwt)
+                    .build()
+                    .encode(StandardCharsets.UTF_8)
+                    .toUriString();
+        }
 
         getRedirectStrategy().sendRedirect(request, response, targetUrl);
     }

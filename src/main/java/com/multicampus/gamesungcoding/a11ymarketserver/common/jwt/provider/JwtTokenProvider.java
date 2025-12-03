@@ -46,6 +46,18 @@ public class JwtTokenProvider {
         return createToken(userId.toString(), role.name());
     }
 
+    public String createTemporaryAccessToken(UUID uuid) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + 5 * 60 * 1000); // 5 minutes
+
+        return Jwts.builder()
+                .subject(uuid.toString())
+                .issuedAt(now)
+                .expiration(expiryDate)
+                .signWith(secretKey)
+                .compact();
+    }
+
     public Authentication getAuthentication(String token) {
         var claims = Jwts.parser()
                 .verifyWith(secretKey)

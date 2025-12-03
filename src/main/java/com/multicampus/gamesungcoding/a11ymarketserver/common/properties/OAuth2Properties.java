@@ -11,4 +11,5 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "oauth2")
 public class OAuth2Properties {
     private String redirectUri;
+    private String signupUri;
 }
