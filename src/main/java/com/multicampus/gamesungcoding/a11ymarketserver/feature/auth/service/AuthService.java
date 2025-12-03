@@ -109,6 +109,11 @@ public class AuthService {
         return UserResponse.fromEntity(userRepository.save(user));
     }
 
+    //이메일 중복 체크 API용
+    public boolean isEmailDuplicate(String email) {
+        return userRepository.existsByUserEmail(email);
+    }
+
     public void logout(String userEmail) {
         userRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new InvalidRequestException("유효하지 않은 사용자입니다."));

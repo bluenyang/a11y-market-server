@@ -67,4 +67,10 @@ public class AuthController {
                 .created(URI.create("/api/v1/users/me"))
                 .body(authService.join(dto));
     }
+
+    @GetMapping("/v1/auth/check-email")
+    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
+        boolean exists = authService.isEmailDuplicate(email);
+        return ResponseEntity.ok(exists);
+    }
 }
