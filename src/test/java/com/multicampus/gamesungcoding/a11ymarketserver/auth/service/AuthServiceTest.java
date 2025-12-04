@@ -131,7 +131,7 @@ class AuthServiceTest {
 
         given(this.userRepository.existsByUserEmail(this.mockEmail))
                 .willReturn(false);
-        given(this.passwordEncoder.encode(joinDto.password()))
+        given(this.passwordEncoder.encode(joinDto.userPass()))
                 .willReturn("encodedPassword");
         given(this.userRepository.save(any(Users.class)))
                 .willAnswer(invocation -> invocation.getArgument(0));

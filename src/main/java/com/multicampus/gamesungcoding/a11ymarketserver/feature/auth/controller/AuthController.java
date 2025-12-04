@@ -2,10 +2,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.dto.JwtResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.dto.RefreshRequest;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.JoinRequest;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.KakaoSignUpRequest;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginRequest;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.LoginResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto.*;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.service.AuthService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserResponse;
 import jakarta.validation.Valid;
@@ -92,9 +89,21 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/v1/auth/check-email")
-    public ResponseEntity<Boolean> checkEmail(@RequestParam String email) {
-        boolean exists = authService.isEmailDuplicate(email);
+    @GetMapping("/v1/auth/check/email")
+    public ResponseEntity<CheckExistsResponse> checkEmail(@RequestParam String email) {
+        var exists = authService.isEmailDuplicate(email);
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/v1/auth/check/phone")
+    public ResponseEntity<CheckExistsResponse> checkPhone(@RequestParam String phone) {
+        var exists = authService.isPhoneDuplicate(phone);
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/v1/auth/check/nickname")
+    public ResponseEntity<CheckExistsResponse> checkNickname(@RequestParam String nickname) {
+        var exists = authService.isNicknameDuplicate(nickname);
         return ResponseEntity.ok(exists);
     }
 }
