@@ -149,6 +149,7 @@ public class CartService {
                 .sum();
     }
 
+    @Transactional(readOnly = true)
     public CartItemCountResponse getCartItemCount(String userEmail) {
         return new CartItemCountResponse(
                 cartItemRepository.countByCart(

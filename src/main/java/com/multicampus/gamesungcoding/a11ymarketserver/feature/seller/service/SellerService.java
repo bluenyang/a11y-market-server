@@ -59,6 +59,7 @@ public class SellerService {
     private final ProductAiSummaryRepository productAiSummaryRepository;
     private final CategoryRepository categoryRepository;
 
+    @Transactional
     public SellerApplyResponse applySeller(String userEmail, SellerApplyRequest request) {
         Users user = userRepository.findByUserEmail(userEmail)
                 .orElseThrow(() -> new UserNotFoundException("사용자 정보가 존재하지 않습니다."));
@@ -82,12 +83,13 @@ public class SellerService {
                 saved.getBusinessNumber(),
                 saved.getSellerGrade(),
                 saved.getSellerIntro(),
-                saved.getA11yGuarantee(),
+                saved.getIsA11yGuarantee(),
                 saved.getSellerSubmitStatus(),
                 saved.getSubmitDate(),
                 saved.getApprovedDate());
     }
 
+    @Transactional
     public ProductDetailResponse registerProduct(String userEmail,
                                                  SellerProductRegisterRequest request,
                                                  List<MultipartFile> images) {
