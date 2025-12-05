@@ -148,4 +148,12 @@ public class CartService {
                 .mapToInt(item -> item.productPrice() * item.quantity())
                 .sum();
     }
+
+    public CartItemCountResponse getCartItemCount(String userEmail) {
+        return new CartItemCountResponse(
+                cartItemRepository.countByCart(
+                        getCartByUserEmail(userEmail)
+                )
+        );
+    }
 }

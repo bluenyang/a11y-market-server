@@ -33,6 +33,13 @@ public class CartController {
         return ResponseEntity.ok(cartService.getCartItems(userEmail));
     }
 
+    @GetMapping("/v1/cart/me/items/count")
+    public ResponseEntity<CartItemCountResponse> getCartItemCount(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        var userEmail = userDetails.getUsername();
+        return ResponseEntity.ok(cartService.getCartItemCount(userEmail));
+    }
+
     // POST /api/v1/cart/items 상품 추가 기능
     @PostMapping("/v1/cart/items")
     @ResponseStatus(HttpStatus.CREATED)

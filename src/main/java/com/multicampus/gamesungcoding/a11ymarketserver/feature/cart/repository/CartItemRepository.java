@@ -24,4 +24,6 @@ public interface CartItemRepository extends JpaRepository<CartItems, UUID> {
             WHERE ci.cartItemId IN :cartItemIds
             """)
     List<CartItems> findAllByIdWithProductAndImage(List<UUID> cartItemIds);
+
+    Integer countByCart(Cart cartByUserEmail);
 }

@@ -1,10 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -21,9 +18,10 @@ public class Categories {
     @Column(length = 16, nullable = false, updatable = false)
     private UUID categoryId;
 
-    @Column(length = 16)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "parent_cat_id")
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private UUID parentCatId;
+    private Categories parentCategory;
 
     @Column(length = 200, nullable = false)
     private String categoryName;
@@ -32,10 +30,10 @@ public class Categories {
     private List<Product> products;
 
     @Builder
-    private Categories(
-            UUID parentCatId,
-            String categoryName) {
-        this.parentCatId = parentCatId;
+    private Categories(Categories parentCategory,
+                       String categoryName) {
+        
+        this.parentCategory = parentCategory;
         this.categoryName = categoryName;
     }
 }
