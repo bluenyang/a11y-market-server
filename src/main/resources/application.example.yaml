@@ -16,14 +16,13 @@ spring:
   open-in-view: false
   # AI model configuration
   ai:
-    vertex:
-      ai:
-        gemini:
-          project-id: your-project-id
-          location: your-location(e.g., asia-northeast3)
-          chat:
-            options:
-              model: gemini-2.5-flash
+    openai:
+      api-key: your-api-key
+      base-url: "https://generativelanguage.googleapis.com/v1beta/openai/"
+      chat:
+        options:
+          model: "gemini-2.0-flash"
+          temperature: 0.7
   # AWS S3 (or MinIO) configuration
   cloud:
     aws:
