@@ -7,6 +7,8 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.Produ
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.controller.SellerController;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto.SellerProductRegisterRequest;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.SellerGrades;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.service.SellerDashboardService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.service.SellerService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +46,8 @@ public class SellerProductControllerTest {
     private AuthenticationManager authenticationManager;
     @MockitoBean
     private SellerService sellerService; // Service Mocking
+    @MockitoBean
+    private SellerDashboardService sellerDashboardService;
 
     @Test
     @DisplayName("상품 등록 API 성공 테스트")
@@ -72,10 +76,17 @@ public class SellerProductControllerTest {
         var respDto = new ProductDetailResponse(
                 UUID.randomUUID(),
                 "New Product",
+                UUID.randomUUID(),
+                "Seller Name",
+                SellerGrades.NEWER,
+                true,
                 0,
                 ProductStatus.PENDING,
                 "Desc",
+                0,
                 List.of(),
+                UUID.randomUUID(),
+                "Category Name",
                 "summary",
                 "context",
                 "method of use");

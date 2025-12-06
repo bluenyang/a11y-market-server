@@ -1,9 +1,11 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.controller;
 
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.dto.DailyRevenueDto;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDTO;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDetailResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto.*;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.service.SellerDashboardService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.service.SellerService;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,6 +30,7 @@ import java.util.UUID;
 public class SellerController {
 
     private final SellerService sellerService;
+    private final SellerDashboardService sellerDashboardService;
 
     @PostMapping("/v1/seller/apply")
     @ResponseStatus(HttpStatus.CREATED)
@@ -141,11 +144,49 @@ public class SellerController {
         return ResponseEntity.ok(claims);
     }
 
-    @GetMapping("/v1/seller/dashboard")
-    public ResponseEntity<SellerDashboardResponse> getDashboard(
+    @GetMapping("/v1/seller/dashboard/stats")
+    public ResponseEntity<SellerDashboardResponse> getDashboardStats(
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        SellerDashboardResponse response = sellerService.getDashboard(userDetails.getUsername());
+        SellerDashboardResponse response = sellerDashboardService.getDashboard(userDetails.getUsername());
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/v1/seller/dashboard/daily-revenue")
+    public ResponseEntity<List<DailyRevenueDto>> getDailyRevenue(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(defaultValue = "2025") int year,
+            @RequestParam(defaultValue = "12") int month) {
+
+        List<DailyRevenueDto> dailyRevenues =
+                sellerDashboardService.getDailyRevenue(
+                        userDetails.getUsername(), year, month);
+        return ResponseEntity.ok(dailyRevenues);
+    }
+
+    @GetMapping("/v1/seller/dashboard/top-products")
+    public ResponseEntity<List<SellerTopProductResponse>> getTopProducts(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam int topN) {
+
+        List<SellerTopProductResponse> topProducts =
+                sellerDashboardService.getTopProducts(userDetails.getUsername(), topN);
+        return ResponseEntity.ok(topProducts);
+    }
+
+    @GetMapping("/v1/seller/dashboard/recent-orders")
+    public ResponseEntity<List<SellerOrderItemResponse>> getRecentOrders(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        log.info("Fetching recent orders for seller: {}, page: {}, size: {}",
+                userDetails.getUsername(), page, size);
+
+        List<SellerOrderItemResponse> recentOrders =
+                sellerDashboardService.getRecentOrders(
+                        userDetails.getUsername(), page, size);
+
+        return ResponseEntity.ok(recentOrders);
     }
 }

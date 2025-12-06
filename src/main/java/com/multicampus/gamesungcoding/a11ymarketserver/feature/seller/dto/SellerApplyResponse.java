@@ -25,7 +25,7 @@ public record SellerApplyResponse(
                 seller.getBusinessNumber(),
                 seller.getSellerGrade(),
                 seller.getSellerIntro(),
-                seller.getA11yGuarantee(),
+                seller.getIsA11yGuarantee(),
                 seller.getSellerSubmitStatus(),
                 seller.getSubmitDate(),
                 seller.getApprovedDate()

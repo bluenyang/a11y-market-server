@@ -2,6 +2,8 @@ package com.multicampus.gamesungcoding.a11ymarketserver.seller.service;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.S3StorageProperties;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ImageMetadata;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Categories;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.CategoryRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto.SellerProductRegisterRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.Seller;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.repository.SellerRepository;
@@ -49,6 +51,9 @@ class SellerProductServiceIntTest {
     private S3StorageProperties s3StorageProperties;
 
     private final String userEmail = "seller@example.com";
+    private UUID categoryId;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @BeforeEach
     void setUp() {
@@ -68,6 +73,14 @@ class SellerProductServiceIntTest {
 
         sellerRepository.save(seller);
 
+        var category = categoryRepository.save(
+                Categories.builder()
+                        .categoryName("Test Category")
+                        .build()
+        );
+
+        categoryId = category.getCategoryId();
+
         Mockito.when(s3StorageProperties.getBucket()).thenReturn("test-bucket");
 
         Mockito.when(productAnalysisService.analysisProductImage(Mockito.any(), Mockito.any(), Mockito.any()))
@@ -78,9 +91,8 @@ class SellerProductServiceIntTest {
     @DisplayName("상품 저장 및 메타데이터 처리 통합 테스트")
     void registerProduct_Integration_Success() {
         // given
-        String categoryId = UUID.randomUUID().toString();
         var request = new SellerProductRegisterRequest(
-                "Integration Product", "DB Test Desc", categoryId, 50000, 100,
+                "Integration Product", "DB Test Desc", this.categoryId.toString(), 50000, 100,
                 List.of(new ImageMetadata("real.jpg", "alt text", 1))
         );
 

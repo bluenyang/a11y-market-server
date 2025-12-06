@@ -62,7 +62,7 @@ class UserManageControllerIntTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("사용자 관리 API 통합 테스트 - 사용자 목록 조회")
     void testGetUserList() throws Exception {
         this.mockMvc.perform(get("/api/v1/admin/users")
@@ -72,7 +72,7 @@ class UserManageControllerIntTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("사용자 관리 API 통합 테스트 - 특정 사용자 권한 변경")
     void testChangeUserRole() throws Exception {
         // 변경 시도

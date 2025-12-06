@@ -41,7 +41,7 @@ class UserManageControllerTest {
     private OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("전체 사용자 조회 테스트")
     void testInquireUsers() throws Exception {
         this.mockMvc.perform(get("/api/v1/admin/users"))
@@ -49,7 +49,7 @@ class UserManageControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("사용자 권한 변경 테스트")
     void testChangeUserPermission() throws Exception {
         UUID mockUserId = UUID.randomUUID();

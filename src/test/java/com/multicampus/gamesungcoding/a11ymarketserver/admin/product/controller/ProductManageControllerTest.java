@@ -43,7 +43,7 @@ class ProductManageControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("등록 대기 상품 조회 테스트")
     void testInquirePendingProducts() throws Exception {
         BDDMockito.given(this.service.inquirePendingProducts()).willReturn(List.of());
@@ -53,7 +53,7 @@ class ProductManageControllerTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("상품 상태 변경 테스트")
     void testChangeProductStatus() throws Exception {
         String mockProductId = "123e4567-e89b-12d3-a456-426614174000";

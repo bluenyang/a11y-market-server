@@ -80,6 +80,12 @@ public class SecurityConfig {
                                 "/connection/test"
                         )
                         .permitAll()
+                        .requestMatchers("/api/*/seller/apply")
+                        .hasRole("USER")
+                        .requestMatchers("/api/*/seller/**")
+                        .hasRole("SELLER")
+                        .requestMatchers("/api/*/admin/**")
+                        .hasRole("ADMIN")
                         .anyRequest()
                         .authenticated())
                 .exceptionHandling(exception -> exception
@@ -90,7 +96,7 @@ public class SecurityConfig {
                             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
                             response.setContentType("application/json;charset=UTF-8");
                             response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \""
-                                    + authException.getMessage() + "\"}");
+                                                       + authException.getMessage() + "\"}");
                         })
                 )
                 .oauth2Login(oauth2 -> oauth2

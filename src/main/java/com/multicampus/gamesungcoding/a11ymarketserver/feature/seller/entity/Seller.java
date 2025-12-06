@@ -47,8 +47,8 @@ public class Seller {
     @Column(length = 1024)
     private String sellerIntro;
 
-    @Column(name = "is_A11y_Guarantee", nullable = false)
-    private Boolean a11yGuarantee;
+    @Column(nullable = false, name = "is_a11y_guarantee")
+    private Boolean isA11yGuarantee;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -74,7 +74,7 @@ public class Seller {
         this.businessNumber = businessNumber;
         this.sellerGrade = SellerGrades.NEWER;
         this.sellerIntro = sellerIntro;
-        this.a11yGuarantee = false;
+        this.isA11yGuarantee = false;
         this.sellerSubmitStatus = SellerSubmitStatus.PENDING;
     }
 
@@ -99,7 +99,7 @@ public class Seller {
         if (businessNumber != null) this.businessNumber = businessNumber;
         if (sellerIntro != null) this.sellerIntro = sellerIntro;
         if (sellerGrade != null) this.sellerGrade = sellerGrade;
-        if (a11yGuarantee != null) this.a11yGuarantee = a11yGuarantee;
+        if (a11yGuarantee != null) this.isA11yGuarantee = a11yGuarantee;
     }
 }
 

@@ -1,7 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.order.dto;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.Orders;
 
 import java.time.LocalDateTime;
@@ -19,7 +18,7 @@ public record OrderDetailResponse(
         String receiverZipcode,
         String receiverAddr1,
         String receiverAddr2,
-        OrderStatus orderStatus,
+        // OrderStatus orderStatus,
         Integer totalPrice,
         LocalDateTime createdAt,
         List<OrderItemResponse> orderItems
@@ -39,7 +38,7 @@ public record OrderDetailResponse(
                 order.getReceiverZipcode(),
                 order.getReceiverAddr1(),
                 order.getReceiverAddr2(),
-                order.getOrderStatus(),
+                // order.getOrderStatus(),
                 order.getTotalPrice(),
                 order.getCreatedAt(),
                 itemResponses

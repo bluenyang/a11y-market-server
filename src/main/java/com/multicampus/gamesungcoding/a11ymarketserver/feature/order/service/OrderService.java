@@ -9,7 +9,10 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.Cart;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.CartItems;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.repository.CartItemRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.dto.*;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.*;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderCheckoutStatus;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.Orders;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrderItemsRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrdersRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Product;
@@ -21,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -142,23 +144,22 @@ public class OrderService {
         // 아직 결제가 완료되지 않은 상태이므로, 사용자가 결제를 취소하거나 수정할 수 있기 때문
         // 결제가 완료된 후에 별도의 프로세스를 통해 CartItems를 정리하는 것이 일반적임
         // 결제 이전에 취소하면, CartItems는 여전히 유효하며, 사용자는 다시 결제를 시도할 수 있음
-        return OrderResponse.fromEntity(ordersRepository.save(order));
+        return OrderResponse.fromEntity(ordersRepository.save(order), null);
     }
 
     // 내 주문 목록 조회
     @Transactional(readOnly = true)
-    public List<OrderDetailResponse> getMyOrders(String userEmail) {
-        var orders = ordersRepository
-                .findAllByUserEmailOrderByCreatedAtDesc(userEmail);
-
-        List<OrderDetailResponse> result = new ArrayList<>(List.of());
-
-        for (Orders order : orders) {
-            List<OrderItems> items = orderItemsRepository.findAllByOrder_OrderId(order.getOrderId());
-            result.add(OrderDetailResponse.fromEntity(order, items));
-        }
-
-        return result;
+    public List<OrderResponse> getMyOrders(String userEmail) {
+        return ordersRepository.findAllByUserEmailOrderByCreatedAtDesc(userEmail)
+                .stream()
+                .map(order -> OrderResponse.fromEntity(
+                        order,
+                        order.getOrderItems()
+                                .stream()
+                                .map(OrderItemResponse::fromEntity)
+                                .toList())
+                )
+                .toList();
     }
 
     // 내 주문 상세 조회

@@ -3,6 +3,8 @@ package com.multicampus.gamesungcoding.a11ymarketserver.seller.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.S3StorageProperties;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ImageMetadata;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Categories;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.CategoryRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto.SellerProductRegisterRequest;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.Seller;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.repository.SellerRepository;
@@ -47,6 +49,8 @@ class SellerProductControllerIntTest {
     private SellerRepository sellerRepository;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     @MockitoBean
     private S3Template s3Template;
@@ -56,6 +60,7 @@ class SellerProductControllerIntTest {
     private S3StorageProperties s3StorageProperties;
 
     private final String userEmail = "seller@example.com";
+    private UUID categoryId;
 
     @BeforeEach
     void setUp() {
@@ -75,6 +80,11 @@ class SellerProductControllerIntTest {
 
         sellerRepository.save(seller);
 
+        var category = categoryRepository.save(Categories.builder()
+                .categoryName("Electronics")
+                .build());
+
+        categoryId = category.getCategoryId();
 
         Mockito.when(s3StorageProperties.getBucket()).thenReturn("test-bucket");
         Mockito.when(productAnalysisService.analysisProductImage(Mockito.any(), Mockito.any(), Mockito.any()))
@@ -89,7 +99,7 @@ class SellerProductControllerIntTest {
         SellerProductRegisterRequest requestDto = new SellerProductRegisterRequest(
                 "Full Flow Product",
                 "Desc",
-                UUID.randomUUID().toString(),
+                this.categoryId.toString(),
                 99000,
                 1,
                 List.of(

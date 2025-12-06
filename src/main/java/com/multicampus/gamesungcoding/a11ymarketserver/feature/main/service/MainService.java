@@ -25,10 +25,12 @@ public class MainService {
     private final CategoryRepository categoryRepository;
     private final MainPageEventsRepository mainPageEventsRepository;
 
+    @Transactional(readOnly = true)
     public List<MonthlyPopularProduct> findTop10ByOrderByRankingAsc() {
         return monthlyPopularProductRepository.findTop10ByOrderByRankingAsc();
     }
 
+    @Transactional(readOnly = true)
     public List<CategoryRecommendResponse> getAllCategories() {
         var list = recommendationRepository.findAll();
 
@@ -56,6 +58,7 @@ public class MainService {
         return roots.values().stream().toList();
     }
 
+    @Transactional(readOnly = true)
     public List<EventResponse> getAllEvents() {
         var list = mainPageEventsRepository.findAllByStartDateBeforeAndEndDateAfterOrderByEventIdAsc(
                 LocalDateTime.now(),

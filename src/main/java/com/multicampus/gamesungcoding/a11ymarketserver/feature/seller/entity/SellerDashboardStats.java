@@ -4,33 +4,31 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Immutable;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
+@Getter
 @Entity
 @Immutable
-@Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "SELLER_SALES_VIEW")
-public class SellerSales {
+@Table(name = "view_seller_dashboard_stats")
+public class SellerDashboardStats {
 
     @Id
-    @Column(nullable = false, length = 16)
+    @Column(columnDefinition = "RAW(16)")
     private UUID sellerId;
 
     @Column
-    private Integer totalSales;
+    private BigDecimal totalRevenue;
 
     @Column
-    private Integer totalOrders;
+    private Long totalOrderCount;
 
     @Column
-    private Integer totalProductsSold;
+    private Long confirmedCount;
 
     @Column
-    private Integer totalCancelled;
+    private Long refundedCount;
 }

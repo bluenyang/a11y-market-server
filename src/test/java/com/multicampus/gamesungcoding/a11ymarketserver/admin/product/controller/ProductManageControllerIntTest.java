@@ -90,7 +90,7 @@ class ProductManageControllerIntTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("등록 대기 상품 조회 통합 테스트")
     void testInquirePendingProducts() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -99,7 +99,7 @@ class ProductManageControllerIntTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("상품 상태 변경 통합 테스트 - 승인")
     void testChangeProductStatusApprove() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders
@@ -115,7 +115,7 @@ class ProductManageControllerIntTest {
     }
 
     @Test
-    @WithMockUser
+    @WithMockUser(roles = "ADMIN")
     @DisplayName("상품 상태 변경 통합 테스트 - 거부")
     void testChangeProductStatusReject() throws Exception {
         this.mockMvc.perform(MockMvcRequestBuilders

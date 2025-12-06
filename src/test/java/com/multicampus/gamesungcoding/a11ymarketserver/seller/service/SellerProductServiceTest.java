@@ -3,6 +3,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.seller.service;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidRequestException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.S3StorageProperties;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ImageMetadata;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Categories;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Product;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductImages;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.CategoryRepository;
@@ -97,7 +98,12 @@ class SellerProductServiceTest {
         BDDMockito.when(sellerRepository.findByUser_UserEmail(email))
                 .thenReturn(Optional.of(seller));
 
+        var category = Categories.builder()
+                .categoryName("Test Category")
+                .build();
         var product = Product.builder()
+                .seller(seller)
+                .category(category)
                 .build();
         BDDMockito.when(productRepository.save(
                         BDDMockito.any(Product.class)))
