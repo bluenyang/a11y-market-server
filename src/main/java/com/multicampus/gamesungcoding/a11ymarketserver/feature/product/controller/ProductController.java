@@ -1,7 +1,7 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.controller;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDTO;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDetailResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping("/v1/products")
-    public ResponseEntity<List<ProductDTO>> getProducts(
+    public ResponseEntity<List<ProductResponse>> getProducts(
             @RequestParam(required = false) String search,
             @RequestParam(required = false) Boolean certified,
             @RequestParam(required = false) String grade) {

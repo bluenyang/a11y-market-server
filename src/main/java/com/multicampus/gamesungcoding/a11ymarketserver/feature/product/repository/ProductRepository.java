@@ -19,9 +19,23 @@ public interface ProductRepository extends JpaRepository<Product, UUID>, JpaSpec
     @Query("""
             SELECT p
             FROM Product p
+             LEFT JOIN FETCH p.seller
+             LEFT JOIN FETCH p.category
+             LEFT JOIN FETCH p.productImages
             WHERE (:search IS NULL OR LOWER(p.productName) LIKE LOWER(CONCAT('%', CONCAT(:search, '%'))))
+             AND p.productStatus = 'APPROVED'
             """)
     List<Product> findFilteredProducts(@Param("search") String search);
+
+    @Query("""
+             SELECT p
+             FROM Product p
+              LEFT JOIN FETCH p.seller
+              LEFT JOIN FETCH p.category
+              LEFT JOIN FETCH p.productImages
+             WHERE p.productStatus = 'APPROVED'
+            """)
+    List<Product> findAllWithDetails();
 
     // 특정 판매자의 상품 전체 조회
     List<Product> findBySeller_SellerId(UUID sellerId);
