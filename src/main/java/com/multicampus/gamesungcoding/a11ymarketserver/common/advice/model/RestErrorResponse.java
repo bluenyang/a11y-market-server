@@ -1,5 +1,8 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.common.advice.model;
 
-public record RestErrorResponse(ErrorRespStatus error,
+import org.springframework.http.HttpStatus;
+
+public record RestErrorResponse(HttpStatus status,
+                                ErrorRespStatus error,
                                 String message) {
 }
