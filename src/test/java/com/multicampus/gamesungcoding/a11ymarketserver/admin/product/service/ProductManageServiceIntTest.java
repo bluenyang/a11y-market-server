@@ -88,7 +88,7 @@ class ProductManageServiceIntTest {
 
         assertThat(pendingProducts).isNotNull();
         assertThat(pendingProducts.size()).isEqualTo(2);
-        assertThat(pendingProducts.getFirst().getProductId())
+        assertThat(pendingProducts.getFirst().productId())
                 .isEqualTo(this.mockProduct1.getProductId());
     }
 

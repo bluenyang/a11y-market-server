@@ -1,7 +1,9 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.product.controller;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.product.service.AdminProductManageService;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductAdminInquireResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDetailResponse;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductStatus;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,10 +22,9 @@ public class AdminProductManageController {
 
     // 관리자 - 승인 대기중인 상품 조회
     @GetMapping("/v1/admin/products/pending")
-    public ResponseEntity<List<ProductDTO>> inquirePendingProducts() {
+    public ResponseEntity<List<ProductAdminInquireResponse>> inquirePendingProducts() {
 
         var list = this.service.inquirePendingProducts();
-        log.info("AdminProductManageController - inquirePendingProducts: Retrieved {} pending products", list.size());
         return ResponseEntity.ok(list);
     }
 

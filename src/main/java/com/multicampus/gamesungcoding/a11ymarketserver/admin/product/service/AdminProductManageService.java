@@ -1,6 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.admin.product.service;
 
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDTO;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductAdminInquireResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +18,7 @@ import java.util.UUID;
 public class AdminProductManageService {
     private final ProductRepository productRepository;
 
-    public List<ProductDTO> inquirePendingProducts() {
+    public List<ProductAdminInquireResponse> inquirePendingProducts() {
         var list = this.productRepository.findAll(
                 (root, query, criteriaBuilder) ->
                         // !! column 이름이 아니라 entity 필드 이름으로 작성히야 함 !!
@@ -33,7 +33,7 @@ public class AdminProductManageService {
 
         log.info("found {} pending products", list.size());
         return list.stream()
-                .map(ProductDTO::fromEntity)
+                .map(ProductAdminInquireResponse::fromEntity)
                 .toList();
     }
 
