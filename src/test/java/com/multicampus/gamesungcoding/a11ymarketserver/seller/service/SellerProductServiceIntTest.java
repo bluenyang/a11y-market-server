@@ -93,7 +93,7 @@ class SellerProductServiceIntTest {
         // given
         var request = new SellerProductRegisterRequest(
                 "Integration Product", "DB Test Desc", this.categoryId.toString(), 50000, 100,
-                List.of(new ImageMetadata("real.jpg", "alt text", 1))
+                List.of(new ImageMetadata("real.jpg", "alt text", 1, null, null))
         );
 
         var image = new MockMultipartFile("images", "real.jpg", "image/png", "binary".getBytes());

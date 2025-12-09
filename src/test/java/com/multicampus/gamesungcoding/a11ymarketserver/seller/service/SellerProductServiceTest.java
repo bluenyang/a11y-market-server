@@ -75,7 +75,9 @@ class SellerProductServiceTest {
                         new ImageMetadata(
                                 "test.jpg",
                                 "alt",
-                                0)
+                                0,
+                                null,
+                                null)
                 )
         );
 

@@ -106,7 +106,9 @@ class SellerProductControllerIntTest {
                         new ImageMetadata(
                                 "flow.jpg",
                                 "alt",
-                                0)
+                                0,
+                                null,
+                                null)
                 )
         );
 
