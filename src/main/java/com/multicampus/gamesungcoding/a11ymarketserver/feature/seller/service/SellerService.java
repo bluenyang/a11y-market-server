@@ -26,6 +26,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.util.gemini.service.Produ
 import io.awspring.cloud.s3.S3Template;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -139,16 +140,18 @@ public class SellerService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProductDTO> getMyProducts(String userEmail) {
+    public List<ProductDTO> getMyProducts(String userEmail, SellerInquireProductRequest req) {
 
         Seller seller = sellerRepository.findByUser_UserEmail(userEmail)
                 .orElseThrow(() -> new DataNotFoundException("판매자 정보를 찾을 수 없습니다."));
 
         UUID sellerId = seller.getSellerId();
 
-        List<Product> products = productRepository.findBySeller_SellerId(sellerId);
+        var pageable = PageRequest.of(req.page(), req.size());
 
-        return products.stream().map(ProductDTO::fromEntity).toList();
+        var products = productRepository.findBySeller_SellerId(sellerId, pageable);
+
+        return products.map(ProductDTO::fromEntity).toList();
     }
 
     @Transactional
@@ -287,16 +290,8 @@ public class SellerService {
             throw new InvalidRequestException("승인된 판매자만 주문 상태를 변경할 수 있습니다.");
         }
 
-        var productIds = productRepository.findBySeller_SellerId(seller.getSellerId())
-                .stream()
-                .map(Product::getProductId)
-                .toList();
-        if (productIds.isEmpty()) {
-            throw new InvalidRequestException("판매자의 상품이 존재하지 않습니다.");
-        }
-
         boolean isMyOrder = orderItemsRepository
-                .existsByOrderItemIdAndProduct_ProductIdIn(orderItemId, productIds);
+                .existsByOrderItemIdAndProduct_Seller(orderItemId, seller);
         if (!isMyOrder) {
             throw new InvalidRequestException("해당 주문 상품에 대한 변경 권한이 없습니다.");
         }
@@ -374,7 +369,7 @@ public class SellerService {
         OrderItemStatus currentStatus = orderItem.getOrderItemStatus();
 
         if (currentStatus != OrderItemStatus.CANCEL_PENDING &&
-            currentStatus != OrderItemStatus.RETURN_PENDING) {
+                currentStatus != OrderItemStatus.RETURN_PENDING) {
             throw new InvalidRequestException("요청 상태의 주문만 처리할 수 있습니다.");
         }
 

@@ -2,6 +2,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository
 
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.Seller;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,7 +20,7 @@ public interface OrderItemsRepository extends JpaRepository<OrderItems, UUID> {
             String userEmail,
             OrderItemStatus status);
 
-    boolean existsByOrderItemIdAndProduct_ProductIdIn(UUID orderItemId, List<UUID> productIds);
+    boolean existsByOrderItemIdAndProduct_Seller(UUID orderItemId, Seller seller);
 
     List<OrderItems> findAllByProduct_Seller_User_UserEmail_AndOrderItemStatusIn(
             String userEmail,

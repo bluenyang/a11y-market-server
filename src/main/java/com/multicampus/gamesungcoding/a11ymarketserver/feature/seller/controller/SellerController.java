@@ -66,9 +66,10 @@ public class SellerController {
 
     @GetMapping("/v1/seller/products")
     public ResponseEntity<List<ProductDTO>> getMyProducts(
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal UserDetails userDetails,
+            @ModelAttribute SellerInquireProductRequest req) {
 
-        List<ProductDTO> products = sellerService.getMyProducts(userDetails.getUsername());
+        List<ProductDTO> products = sellerService.getMyProducts(userDetails.getUsername(), req);
         return ResponseEntity.ok(products);
     }
 
