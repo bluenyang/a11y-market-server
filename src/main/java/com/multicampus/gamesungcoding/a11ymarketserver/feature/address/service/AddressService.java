@@ -79,9 +79,14 @@ public class AddressService {
                         .build()
         );
 
-        if (dto.isDefault() != null && dto.isDefault()) {
-            // 기본 배송지로 설정
-            this.setDefaultAddressByAddressId(userEmail, UUID.fromString(addressId));
+        if (dto.isDefault() != null) {
+            if (dto.isDefault()) {
+                // 기본 배송지로 설정
+                this.setDefaultAddressByAddressId(userEmail, UUID.fromString(addressId));
+            } else if (address.getIsDefault() && !dto.isDefault()) {
+                // 기본 배송지 설정 해제
+                address.setDefault(false);
+            }
         }
 
         return AddressResponse.fromEntity(address);
