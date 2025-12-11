@@ -199,9 +199,6 @@ public class SellerController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
 
-        log.info("Fetching recent orders for seller: {}, page: {}, size: {}",
-                userDetails.getUsername(), page, size);
-
         List<SellerOrderItemResponse> recentOrders =
                 sellerDashboardService.getRecentOrders(
                         userDetails.getUsername(), page, size);

@@ -38,7 +38,6 @@ public class TossPaymentService {
                     .body(body)
                     .retrieve()
                     .toBodilessEntity();
-            log.info("Payment confirmation successful for paymentKey: {}", paymentKey);
         } catch (Exception e) {
             log.error("Payment confirmation failed for paymentKey: {}. Error: {}", paymentKey, e.getMessage());
             throw new RuntimeException("결제 승인에 실패했습니다.");
@@ -67,7 +66,6 @@ public class TossPaymentService {
                     .body(body)
                     .retrieve()
                     .toBodilessEntity();
-            log.info("Payment cancellation successful for paymentKey: {}", paymentKey);
         } catch (Exception e) {
             log.error("Payment cancellation failed for paymentKey: {}. Error: {}", paymentKey, e.getMessage());
             throw new RuntimeException("결제 취소에 실패했습니다.");

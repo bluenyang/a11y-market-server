@@ -522,15 +522,11 @@ public class SellerService {
         UUID fileId = GUID.v7().toUUID();
         String uniqueFileName = folder + "/" + fileId + "_" + originalFilename;
 
-        log.info("Generated unique file name: {}", uniqueFileName);
-
         try {
             String bucketName = this.s3StorageProperties.getBucket();
             this.s3Template.upload(bucketName,
                     uniqueFileName,
                     image.getInputStream());
-
-            log.info("Uploaded image to S3 bucket: {}", "/" + bucketName + "/" + uniqueFileName);
 
             return "/" + bucketName + "/" + uniqueFileName;
         } catch (IOException e) {

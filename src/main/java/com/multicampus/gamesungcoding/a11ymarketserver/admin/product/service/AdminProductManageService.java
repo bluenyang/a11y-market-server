@@ -31,7 +31,6 @@ public class AdminProductManageService {
             return List.of();
         }
 
-        log.info("found {} pending products", list.size());
         return list.stream()
                 .map(ProductAdminInquireResponse::fromEntity)
                 .toList();
@@ -44,6 +43,5 @@ public class AdminProductManageService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         user.changeStatus(status);
-        log.info("changeProductStatus - product status changed to {}", status);
     }
 }

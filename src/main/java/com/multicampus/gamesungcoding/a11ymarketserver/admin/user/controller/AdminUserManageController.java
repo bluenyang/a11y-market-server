@@ -24,7 +24,6 @@ public class AdminUserManageController {
     public ResponseEntity<List<UserAdminResponse>> inquireUsers() {
 
         var userList = userService.listAll();
-        log.info("AdminUserManageController - inquireUsers: Retrieved {} users", userList.size());
         return ResponseEntity.ok(userList);
     }
 
