@@ -18,5 +18,9 @@ public record PaymentVerifyRequest(
         @NotBlank(message = "결제 방식은 필수입니다.")
         String method,
 
+        String paymentKey,
+        
+        String impUid,
+
         List<String> cartItemIdsToDelete) {
 }

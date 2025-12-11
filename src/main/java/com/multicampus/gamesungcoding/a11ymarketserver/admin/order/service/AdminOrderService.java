@@ -5,7 +5,6 @@ import com.multicampus.gamesungcoding.a11ymarketserver.admin.order.model.AdminOr
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotFoundException;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.dto.OrderDetailResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.Orders;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrderItemsRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrdersRepository;
@@ -42,13 +41,11 @@ public class AdminOrderService {
                 .collect(Collectors.toList());
     }
 
-    public ResponseEntity<OrderDetailResponse> getOrderDetails(UUID orderId) {
-        Orders order = ordersRepository.findById(orderId)
-                .orElseThrow(() -> new DataNotFoundException("Order not found"));
+    public ResponseEntity<OrderDetailResponse> getOrderDetails(UUID orderItemId) {
+        var item = orderItemsRepository.findById(orderItemId)
+                .orElseThrow(() -> new DataNotFoundException("Order item not found"));
 
-        List<OrderItems> items = orderItemsRepository.findAllByOrder_OrderId(orderId);
-
-        return ResponseEntity.ok(OrderDetailResponse.fromEntity(order, items));
+        return ResponseEntity.ok(OrderDetailResponse.fromEntity(item));
     }
 
     @Transactional

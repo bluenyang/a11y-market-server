@@ -100,7 +100,7 @@ public class Orders {
     }
 
     @Deprecated
-    public void updateOrderItemStatus(OrderStatus orderStatus) {
+    public void updateOrderItemStatus() {
         // this.orderStatus = orderStatus;
     }
 

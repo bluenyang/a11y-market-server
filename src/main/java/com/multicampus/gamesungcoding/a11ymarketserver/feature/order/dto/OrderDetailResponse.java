@@ -1,12 +1,9 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.order.dto;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.Orders;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 public record OrderDetailResponse(
         UUID orderId,
@@ -21,12 +18,11 @@ public record OrderDetailResponse(
         // OrderStatus orderStatus,
         Integer totalPrice,
         LocalDateTime createdAt,
-        List<OrderItemResponse> orderItems
-) {
-    public static OrderDetailResponse fromEntity(Orders order, List<OrderItems> items) {
-        List<OrderItemResponse> itemResponses = items.stream()
-                .map(OrderItemResponse::fromEntity)
-                .collect(Collectors.toList());
+        OrderItemResponse orderItem) {
+    
+    public static OrderDetailResponse fromEntity(OrderItems orderItem) {
+        var item = OrderItemResponse.fromEntity(orderItem);
+        var order = orderItem.getOrder();
 
         return new OrderDetailResponse(
                 order.getOrderId(),
@@ -41,7 +37,7 @@ public record OrderDetailResponse(
                 // order.getOrderStatus(),
                 order.getTotalPrice(),
                 order.getCreatedAt(),
-                itemResponses
+                item
         );
     }
 }
