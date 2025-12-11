@@ -5,6 +5,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidR
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.dto.AddressResponse;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.entity.Addresses;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.repository.AddressRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartItemDto;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.Cart;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.entity.CartItems;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.repository.CartItemRepository;
@@ -16,7 +17,6 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.Orde
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrderItemsRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrdersRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Product;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductImages;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductImagesRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository;
@@ -93,7 +93,7 @@ public class OrderService {
     }
 
     public OrderSheetResponse getOrderSheet(String userEmail, OrderSheetRequest req) {
-        List<OrderItemResponse> orderItems = new ArrayList<>();
+        List<CartItemDto> orderItems = new ArrayList<>();
 
         if (req.isFromCart()) {
             var itemIds = req.getCartItemIds()
@@ -111,7 +111,7 @@ public class OrderService {
                     throw new InvalidRequestException("구매할 수 없는 상품이 포함되어 있습니다.");
                 }
 
-                orderItems.add(OrderItemResponse.fromEntity(item));
+                orderItems.add(CartItemDto.fromEntity(item));
             }
         } else {
             var orderItemReq = req.getDirectOrderItem();
@@ -125,11 +125,11 @@ public class OrderService {
             if (product.getProductStock() < orderItemReq.quantity()) {
                 throw new InvalidRequestException("재고가 부족한 상품입니다.");
             }
-            orderItems.add(OrderItemResponse.of(product, orderItemReq.quantity()));
+            orderItems.add(CartItemDto.of(product, orderItemReq.quantity()));
         }
 
         int totalAmount = orderItems.stream()
-                .mapToInt(item -> item.productPrice() * item.productQuantity())
+                .mapToInt(item -> item.productPrice() * item.quantity())
                 .sum();
 
         int shippingFee = 0;
@@ -139,12 +139,6 @@ public class OrderService {
         if (addresses.isEmpty()) {
             throw new DataNotFoundException("사용 가능한 배송지가 없습니다.");
         }
-
-        var defaultAddress = addresses
-                .stream()
-                .filter(Addresses::getIsDefault)
-                .findFirst()
-                .orElse(addresses.getFirst()); // 기본 배송지가 없으면 첫 번째 주소 사용
 
         return new OrderSheetResponse(
                 orderItems,
@@ -157,7 +151,9 @@ public class OrderService {
     // 주문 생성
     @Transactional
     public OrderResponse createOrder(String userEmail, OrderCreateRequest req) {
-        Addresses address = addressRepository.findByUser_UserEmail(userEmail)
+        Addresses address = addressRepository.findByAddressIdAndUser_UserEmail(
+                        UUID.fromString(req.addressId()),
+                        userEmail)
                 .orElseThrow(() -> new DataNotFoundException("주소를 찾을 수 없습니다."));
 
         Orders order = ordersRepository.save(Orders.builder()
@@ -173,44 +169,38 @@ public class OrderService {
                 // .orderStatus(OrderStatus.PENDING)
                 .build());
 
-        var cartItems = this.getCartItemsByIds(userEmail, req.orderItemIds());
+        List<OrderItems> orderItemsList = new ArrayList<>();
         int totalAmount = 0;
 
-        for (var cartItem : cartItems) {
-            Product product = cartItem.getProduct();
-            if (product == null) {
-                throw new DataNotFoundException("장바구니에 담긴 상품을 찾을 수 없습니다.");
+        if (req.isFromCart()) {
+            var cartItems = this.getCartItemsByIds(userEmail, req.cartItemIds());
+
+            for (var cartItem : cartItems) {
+                this.validateProduct(cartItem.getProduct(), cartItem.getQuantity());
+
+                OrderItems item = createOrderItemFromProduct(order, cartItem.getProduct(), cartItem.getQuantity());
+                orderItemsList.add(item);
+                totalAmount += item.getProductPrice() * item.getProductQuantity();
             }
+        } else if (req.directOrderItem() != null) {
+            var directItemReq = req.directOrderItem();
 
-            ProductImages images = productImagesRepository.findById(product.getProductId())
-                    .orElseThrow(() -> new DataNotFoundException("상품 이미지를 찾을 수 없습니다."));
+            Product product = productRepository.findById(UUID.fromString(directItemReq.productId()))
+                    .orElseThrow(() -> new DataNotFoundException("상품을 찾을 수 없습니다."));
 
-            int quantity = cartItem.getQuantity();
-            int price = product.getProductPrice();
+            this.validateProduct(product, directItemReq.quantity());
 
-            // 주문 아이템 생성
-            orderItemsRepository.save(
-                    OrderItems.builder()
-                            .order(order)
-                            .product(product)
-                            .productName(product.getProductName())
-                            .productPrice(price)
-                            .productQuantity(quantity)
-                            .productImageUrl(images.getImageUrl())
-                            .build()
-            );
-
-            // 총 금액 계산
-            totalAmount += price * quantity;
+            OrderItems item = createOrderItemFromProduct(order, product, directItemReq.quantity());
+            orderItemsList.add(item);
+            totalAmount += item.getProductPrice() * item.getProductQuantity();
+        } else {
+            throw new InvalidRequestException("주문할 아이템이 없습니다.");
         }
 
+        orderItemsRepository.saveAll(orderItemsList);
         order.updateTotalPrice(totalAmount);
 
-        // 주문 정보를 저장하면서 CartItems를 정리하지 않는 이유:
-        // 아직 결제가 완료되지 않은 상태이므로, 사용자가 결제를 취소하거나 수정할 수 있기 때문
-        // 결제가 완료된 후에 별도의 프로세스를 통해 CartItems를 정리하는 것이 일반적임
-        // 결제 이전에 취소하면, CartItems는 여전히 유효하며, 사용자는 다시 결제를 시도할 수 있음
-        return OrderResponse.fromEntity(ordersRepository.save(order));
+        return OrderResponse.fromEntity(order);
     }
 
     // 내 주문 목록 조회
@@ -346,12 +336,23 @@ public class OrderService {
                 throw new InvalidRequestException("결제할 수 없는 상품이 포함되어 있습니다.");
             }
             item.updateOrderItemStatus(OrderItemStatus.PAID);
+
+            // 재고 차감
+            item.getProduct().fillUpStock(-item.getProductQuantity());
         }
 
-        // order.updateOrderItemStatus(OrderStatus.PAID);
+        if (req.cartItemIdsToDelete() != null && !req.cartItemIdsToDelete().isEmpty()) {
+            List<UUID> cartUuids = req.cartItemIdsToDelete()
+                    .stream()
+                    .map(UUID::fromString)
+                    .toList();
+            cartItemRepository.deleteAllByIdInBatch(cartUuids);
+        }
 
         return PaymentVerifyResponse.success(order.getOrderId(), expectedAmount);
     }
+
+    // Helper methods
 
     private List<CartItems> getCartItemsByIds(String userEmail, List<String> orderItemIds) {
         List<UUID> itemUuids;
@@ -389,5 +390,30 @@ public class OrderService {
         }
 
         return cartItems;
+    }
+
+    private void validateProduct(Product product, int quantity) {
+        if (product.getProductStatus() != ProductStatus.APPROVED) {
+            throw new InvalidRequestException("구매할 수 없는 상품이 포함되어 있습니다.");
+        }
+
+        if (product.getProductStock() < quantity) {
+            throw new InvalidRequestException("재고가 부족한 상품이 포함되어 있습니다.");
+        }
+    }
+
+    private OrderItems createOrderItemFromProduct(Orders order, Product product, int quantity) {
+        String imageUrl = product.getProductImages().isEmpty()
+                ? null
+                : product.getProductImages().getFirst().getImageUrl();
+
+        return OrderItems.builder()
+                .order(order)
+                .product(product)
+                .productName(product.getProductName())
+                .productPrice(product.getProductPrice())
+                .productQuantity(quantity)
+                .productImageUrl(imageUrl)
+                .build();
     }
 }
