@@ -2,6 +2,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.feature.order.service;
 
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotFoundException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidRequestException;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.TossPaymentProperties;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.entity.Addresses;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.address.repository.AddressRepository;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.CartItemDto;
@@ -22,10 +23,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 // 결제 정보 조회
 @Slf4j
@@ -38,6 +38,7 @@ public class OrderService {
     private final OrdersRepository ordersRepository;
     private final OrderItemsRepository orderItemsRepository;
     private final ProductRepository productRepository;
+    private final TossPaymentProperties tossPaymentProperties;
 
     public OrderSheetResponse getOrderSheet(String userEmail, OrderSheetRequest req) {
         List<CartItemDto> orderItems = new ArrayList<>();
@@ -297,6 +298,35 @@ public class OrderService {
         }
 
         return PaymentVerifyResponse.success(order.getOrderId(), expectedAmount);
+    }
+
+    public void cancelPayment(String paymentKey, String reason, int cancelAmount) {
+        String encodedKey = Base64.getEncoder()
+                .encodeToString((tossPaymentProperties.getSecretKey() + ":")
+                        .getBytes());
+
+        var restClient = RestClient.builder()
+                .baseUrl("https://api.tosspayments.com/v1/payments")
+                .defaultHeader("Authorization", "Basic " + encodedKey)
+                .defaultHeader("Content-Type", "application/json")
+                .build();
+
+        Map<String, Object> body = Map.of(
+                "cancelReason", reason,
+                "cancelAmount", cancelAmount
+        );
+
+        try {
+            restClient.post()
+                    .uri("/{paymentKey}/cancel", paymentKey)
+                    .body(body)
+                    .retrieve()
+                    .toBodilessEntity();
+            log.info("Payment cancellation successful for paymentKey: {}", paymentKey);
+        } catch (Exception e) {
+            log.error("Payment cancellation failed for paymentKey: {}. Error: {}", paymentKey, e.getMessage());
+            throw new RuntimeException("결제 취소에 실패했습니다.");
+        }
     }
 
     // Helper methods
