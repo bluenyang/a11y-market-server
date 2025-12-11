@@ -202,7 +202,7 @@ public class OrderService {
                 orderItem.updateOrderItemStatus(OrderItemStatus.CANCELED);
                 orderItem.getProduct().fillUpStock(orderItem.getProductQuantity());
             }
-            case SHIPPED -> orderItem.updateOrderItemStatus(OrderItemStatus.RETURN_PENDING);
+            case ACCEPTED, SHIPPED -> orderItem.updateOrderItemStatus(OrderItemStatus.RETURN_PENDING);
             default -> throw new InvalidRequestException("취소할 수 없는 주문 상태입니다.");
         }
 

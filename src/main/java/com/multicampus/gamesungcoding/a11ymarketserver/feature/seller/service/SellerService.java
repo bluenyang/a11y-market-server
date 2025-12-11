@@ -9,6 +9,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.S3Stora
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrderItemsRepository;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.service.TossPaymentService;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.*;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.*;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.CategoryRepository;
@@ -51,6 +52,7 @@ public class SellerService {
     private final ProductAnalysisService productAnalysisService;
     private final ProductAiSummaryRepository productAiSummaryRepository;
     private final CategoryRepository categoryRepository;
+    private final TossPaymentService tossPaymentService;
 
     @Transactional
     public SellerApplyResponse applySeller(String userEmail, SellerApplyRequest request) {
@@ -419,9 +421,21 @@ public class SellerService {
 
         if (request.action().isApproved()) {
             if (currentStatus == OrderItemStatus.CANCEL_PENDING) {
+                tossPaymentService.cancelPayment(
+                        orderItem.getOrder().getPaymentKey(),
+                        "주문 취소 승인",
+                        orderItem.getProductPrice() * orderItem.getProductQuantity()
+                );
+
                 orderItem.updateOrderItemStatus(OrderItemStatus.CANCELED);
             } else {
                 // 위에서 이미 걸러 냈기 때문에 else if 문은 필요하지 않음
+                tossPaymentService.cancelPayment(
+                        orderItem.getOrder().getPaymentKey(),
+                        "반품 승인",
+                        orderItem.getProductPrice() * orderItem.getProductQuantity()
+                );
+
                 orderItem.updateOrderItemStatus(OrderItemStatus.RETURNED);
             }
         } else {
