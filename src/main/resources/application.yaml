@@ -7,24 +7,24 @@ spring:
       max-request-size: 100MB
   # Database configuration
   datasource:
-    url: dbURL
-    username: DBUSER
-    password: DBPASSWORD
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   # JPA configuration
   jpa:
-    show-sql: false
+    show-sql: ${JPA_SHOW_SQL:false}
     properties:
       hibernate:
-        show_sql: false
+        show_sql: ${JPA_SHOW_SQL:false}
         default_batch_fetch_size: 100
     hibernate:
-      ddl-auto: validate
-  # Disable Open Session in View to prevent lazy loading issues
-  open-in-view: false
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    # Disable Open Session in View to prevent lazy loading issues
+    open-in-view: false
   # AI model configuration
   ai:
     openai:
-      api-key: your-api-key
+      api-key: ${GEMINI_API_KEY}
       base-url: "https://generativelanguage.googleapis.com/v1beta/openai/"
       chat:
         options:
@@ -34,22 +34,22 @@ spring:
   cloud:
     aws:
       region:
-        static: user-region
+        static: ${S3_REGION:us-east-1}
       credentials:
-        access-key: "user-access-key"
-        secret-key: "user-secret-key"
+        access-key: ${S3_ACCESS_KEY:user-access-key}
+        secret-key: ${S3_SECRET_KEY:user-secret-key}
       s3:
-        endpoint: "your-bucket-endpoint"
+        endpoint: ${S3_ENDPOINT_URL}
         path-style-access-enabled: true
   security:
     oauth2:
       client:
         registration:
           kakao:
-            client-id: your-client-id
-            client-secret: your-client-secret
+            client-id: ${KAKAO_CLIENT_ID}
+            client-secret: ${KAKAO_CLIENT_SECRET}
             client-name: Kakao
-            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            redirect-uri: ${KAKAO_REDIRECT_URI:http://localhost:8080/login/oauth2/code/kakao}
             authorization-grant-type: authorization_code
             client-authentication-method: client_secret_post
         provider:
@@ -59,15 +59,14 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 
-
 oauth2:
-  redirect-uri: http://localhost:5173/auth/oauth-redirect
-  signup-uri: http://localhost:5173/auth/oauth-signup
+  redirect-uri: ${OAUTH2_REDIRECT_URI:http://localhost:5173/auth/oauth-redirect}
+  signup-uri: ${OAUTH2_SIGNUP_URI:http://localhost:5173/auth/oauth-signup}
 
 # S3(MinIO) bucket configuration
 app:
   s3:
-    bucket: bucket-name
+    bucket: ${S3_BUCKET_NAME:a11ymarket-bucket}
 
 # Server configuration
 server:
@@ -83,30 +82,25 @@ management:
 # Logging configuration
 logging:
   level:
-    root: INFO
-    org:
-      springframework:
-        web: DEBUG
-        security: DEBUG
+    root: ${LOGGING_LEVEL_ROOT:INFO}
     com:
       multicampus:
         gamesungcoding:
-          a11ymarketserver: DEBUG
+          a11ymarketserver: ${LOGGING_LEVEL_APP:INFO}
 
 # CORS configuration
 cors:
-  allowed-origin-patterns:
-    - "http://localhost:8080"
-    - "http://localhost:5173"
-    - # update with your domain
+  allowed-origin-patterns: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://locahost:8080}
 
-    # JWT configuration
+  # JWT configuration
 jwt:
-  secret: your-jwt-secret-key
-  access-token-validity-ms: 1800000
-  refresh-token-validity-ms: 604800000
+  secret: ${JWT_SECRET}
+  access-token-validity-ms: ${JWT_ACCESS_TOKEN_VALIDITY_MS:1800000}
+  refresh-token-validity-ms: ${JWT_REFRESH_TOKEN_VALIDITY_MS:604800000}
 
 # Swagger configuration
 springdoc:
   api-docs:
-    enabled: true
+    enabled: ${SWAGGER_DOCS_ENABLED:true}
+  swagger-ui:
+    enabled: ${SWAGGER_UI_ENABLED:true}

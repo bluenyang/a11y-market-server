@@ -100,7 +100,7 @@ jobs:
       PR_NUMBER: ${{ needs.build-and-push.outputs.pr_number }}
       TEAM_USER: ${{ secrets.TEAM_USER }}
       TEAM_PASS: ${{ secrets.TEAM_PASS }}
-      APPLICATION_YAML: ${{ secrets.APPLICATION_PR_YAML }}
+      ENV_FILE_CONTENT: ${{ secrets.ENV_PR_TEST }}
 
     steps:
       - name: Checkout code
@@ -138,11 +138,10 @@ jobs:
           cat <<'EOF' > ${{ env.DEPLOY_PATH }}/docker-compose.yaml
           ${{ env.COMPOSE_CONTENT }}
           EOF
-
-          # Write application.yaml
-          echo "[LOG] build application.yaml ..."
-          cat <<'EOF' > ${{ env.DEPLOY_PATH }}/config/application.yaml
-          ${{ env.APPLICATION_YAML }}
+          
+          echo "[LOG] creating .env file ..."
+          cat <<'EOF' > "${{ env.DEPLOY_PATH }}/.env"
+          ${{ env.ENV_FILE_CONTENT }}
           EOF
 
           # change dir into deploy path

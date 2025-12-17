@@ -1,25 +1,23 @@
 services:
   app:
-    image: ${IMAGE_TAG}
-    container_name: ${SERVICE_NAME}
+    image: ghcr.io/gamesung-coding/a11y-market-server:latest
+    container_name: a11ymarket
     restart: always
     networks:
       - proxy
       - db-net
-    environment:
-      - SPRING_CONFIG_IMPORT=optional:file:/app/config/application.yaml
-    volumes:
-      - ${DEPLOY_PATH}/config/application.yaml:/app/config/application.yaml:ro
+    env_file:
+      - .env
     labels:
       # Traefik setting
       - "traefik.enable=true"
       - "traefik.docker.network=proxy"
       # Router setting
-      - "traefik.http.routers.${SERVICE_NAME}-app.rule=Host(`${HOST_NAME}`)"
-      - "traefik.http.routers.${SERVICE_NAME}-app.entrypoints=websecure"
-      - "traefik.http.routers.${SERVICE_NAME}-app.tls=true"
+      - "traefik.http.routers.a11ymarket-server-app.rule=Host(`${HOST_NAME}`)"
+      - "traefik.http.routers.a11ymarket-server-app.entrypoints=websecure"
+      - "traefik.http.routers.a11ymarket-server-app.tls=true"
       # Service Setting
-      - "traefik.http.services.${SERVICE_NAME}.loadbalancer.server.port=8080"
+      - "traefik.http.services.a11ymarket-server-app.loadbalancer.server.port=8080"
     healthcheck:
       test: [ "CMD", "wget", "--quiet", "--spider", "http://localhost:8080/actuator/health" ]
       interval: 30s
