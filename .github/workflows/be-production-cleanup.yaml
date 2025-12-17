@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
 
 env:
-  SERVICE_NAME: be-staging
+  SERVICE_NAME: be-production
   DEPLOY_PATH: ${{ secrets.AWS_DOCKER_DIR }}/deployments/be-production
 
 jobs:

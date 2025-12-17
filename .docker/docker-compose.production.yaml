@@ -1,0 +1,32 @@
+services:
+  app:
+    image: ghcr.io/gamesung-coding/a11y-market-server:latest
+    container_name: a11ymarket
+    restart: always
+    networks:
+      - proxy
+      - db-net
+    env_file:
+      - .env
+    labels:
+      # Traefik setting
+      - "traefik.enable=true"
+      - "traefik.docker.network=proxy"
+      # Router setting
+      - "traefik.http.routers.a11ymarket-server-app.rule=Host(`${HOST_NAME}`)"
+      - "traefik.http.routers.a11ymarket-server-app.entrypoints=websecure"
+      - "traefik.http.routers.a11ymarket-server-app.tls=true"
+      # Service Setting
+      - "traefik.http.services.a11ymarket-server-app.loadbalancer.server.port=8080"
+    healthcheck:
+      test: [ "CMD", "wget", "--quiet", "--spider", "http://localhost:8080/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+networks:
+  proxy:
+    external: true
+  db-net:
+    external: true

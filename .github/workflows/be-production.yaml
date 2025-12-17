@@ -1,18 +1,16 @@
 name: BE | Production - Build and Deploy
 on:
   push:
-    branches:
-      - master
     tags:
       - 'v*.*.*'
   workflow_dispatch:
 
 env:
   # GHCR image name
-  IMAGE_NAME: ghcr.io/${{ secrets.GHCR_USER }}/${{ github.event.repository.name }}
-  # Fixed value for staging
-  IMAGE_TAG: ghcr.io/${{ secrets.GHCR_USER }}/${{ github.event.repository.name }}:${{ github.ref_name }}
-  SERVICE_NAME: be-staging
+  IMAGE_NAME: ghcr.io/gamesung-coding/a11y-market-server
+  # Fixed value for production deployment
+  IMAGE_TAG: ghcr.io/gamesung-coding/a11y-market-server:latest
+  SERVICE_NAME: be-production
   DEPLOY_PATH: ${{ secrets.AWS_DOCKER_DIR }}/deployments/be-production
 
 jobs:
@@ -52,7 +50,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
-          username: ${{ secrets.GHCR_USER }}
+          username: gamesung-coding
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push docker image
@@ -73,48 +71,49 @@ jobs:
 
     # Set output and secrets received through needs as global variables
     env:
-      HOST_NAME: ${{ secrets.STAGING_API_URL }}
-      TEAM_USER: ${{ secrets.TEAM_USER }}
-      TEAM_PASS: ${{ secrets.TEAM_PASS }}
-      APPLICATION_YAML: ${{ secrets.APPLICATION_PRODUCTION_YAML }}
+      ENV_FILE_CONTENT: ${{ secrets.ENV_PRODUCTION }}
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Create compose file from template
+      - name: Create compose file from production template
         run: |
-          export COMPOSE_CONTENT=$(envsubst < .docker/docker-compose.template.yaml)
+          export COMPOSE_CONTENT=$(envsubst < .docker/docker-compose.production.yaml)
           echo "COMPOSE_CONTENT<<EOF" >> $GITHUB_ENV
           echo "$COMPOSE_CONTENT" >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
       - name: Deploy to server
         run: |
-          mkdir -p ${{ env.DEPLOY_PATH }}/config
+          mkdir -p ${{ env.DEPLOY_PATH }}
+          
           echo "[LOG] build compose file ..."
-          cat <<'EOF' > ${{ env.DEPLOY_PATH }}/docker-compose.yaml
-          ${{ env.COMPOSE_CONTENT }}
+          cp .docker/docker-compose.production.yaml ${{ env.DEPLOY_PATH }}/docker-compose.yaml
+          
+          echo "[LOG] creating .env file ..."
+          cat <<'EOF' > "${{ env.DEPLOY_PATH }}/.env"
+          ${{ env.ENV_FILE_CONTENT }}
           EOF
-          echo "[LOG] build application.yaml ..."
-          cat <<'EOF' > "${{ env.DEPLOY_PATH }}/config/application.yaml"
-          ${{ env.APPLICATION_YAML }}
-          EOF
+          
           cd ${{ env.DEPLOY_PATH }}
+          
           echo "[LOG] log-in Github container registry"
-          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "gamesung-coding" --password-stdin
+          
           echo "[LOG] pull docker image"
           docker pull ${{ env.IMAGE_TAG }}
+          
           echo "[LOG] docker container up"
           docker compose -f docker-compose.yaml -p ${{ env.SERVICE_NAME }} up -d --remove-orphans
+          
           docker image prune -f
 
       - name: 🚀 Notify Deployment Success
         if: success() # When previous step finished completely
         run: |
-          export HOSTNAME=${{ env.HOST_NAME }}
           echo "### ✅ Staging 서버 배포 성공" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "Staging 서버가 성공적으로 배포되었습니다." >> $GITHUB_STEP_SUMMARY
-          echo "액세스 URL: `https://$HOST_NAME`" >> $GITHUB_STEP_SUMMARY
+          echo "액세스 URL: `https://a11ymarket.croffledev.kr`" >> $GITHUB_STEP_SUMMARY
         shell: bash

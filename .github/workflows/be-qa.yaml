@@ -91,7 +91,7 @@ jobs:
       CLEAN_VERSION: ${{ needs.build-and-push.outputs.clean_version }}
       TEAM_USER: ${{ secrets.TEAM_USER }}
       TEAM_PASS: ${{ secrets.TEAM_PASS }}
-      APPLICATION_YAML: ${{ secrets.APPLICATION_QA_YAML }}
+      ENV_FILE_CONTENT: ${{ secrets.ENV_QA }}
 
     steps:
       - name: Checkout code
@@ -120,17 +120,23 @@ jobs:
           cat <<'EOF' > ${{ env.DEPLOY_PATH }}/docker-compose.yaml
           ${{ env.COMPOSE_CONTENT }}
           EOF
-          echo "[LOG] build application.yaml ..."
-          cat <<'EOF' > ${{ env.DEPLOY_PATH }}/config/application.yaml
-          ${{ env.APPLICATION_YAML }}
+          
+          echo "[LOG] creating .env file ..."
+          cat <<'EOF' > "${{ env.DEPLOY_PATH }}/.env"
+          ${{ env.ENV_FILE_CONTENT }}
           EOF
+          
           cd ${{ env.DEPLOY_PATH }}
+          
           echo "[LOG] log-in Github container registry"
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ secrets.GHCR_USER }}" --password-stdin
+          
           echo "[LOG] pull docker image"
           docker pull ${{ env.IMAGE_TAG }}
+          
           echo "[LOG] docker container up"
           docker compose -f docker-compose.yaml -p ${{ env.SERVICE_NAME }} up -d --remove-orphans
+          
           docker image prune -f
 
       - name: Notify Deployment Success
