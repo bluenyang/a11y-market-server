@@ -1,8 +1,9 @@
 name: BE | QA - Build and Deploy
 on:
-  push:
-    branches:
-      - 'release/**'
+  # push:
+  #   branches:
+  #     - 'release/**'
+  workflow_dispatch:
 
 env:
   IMAGE_NAME: ghcr.io/${{ secrets.GHCR_USER }}/${{ github.event.repository.name }}

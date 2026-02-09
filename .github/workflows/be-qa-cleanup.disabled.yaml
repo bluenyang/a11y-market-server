@@ -1,14 +1,14 @@
 name: BE | QA - Cleanup
 on:
-  delete:
-    branches:
-      - 'release/**'
+  # delete:
+  #   branches:
+  #     - 'release/**'
   workflow_dispatch:
-    inputs:
-      version:
-        description: '삭제할 QA branch 이름'
-        required: true
-        type: string
+  # inputs:
+  #   version:
+  #     description: '삭제할 QA branch 이름'
+  #     required: true
+  #     type: string
 
 jobs:
   cleanup:

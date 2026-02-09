@@ -1,13 +1,14 @@
 name: BE | PR Check & Dynamic QA - Build and Deploy
 
 on:
-  pull_request:
-    branches:
-      - develop # pr into develop
-    types:
-      - opened # pr opened
-      - synchronize # new commit
-      - reopened # pr reopened
+  # pull_request:
+  #   branches:
+  #     - develop # pr into develop
+  #   types:
+  #     - opened # pr opened
+  #     - synchronize # new commit
+  #     - reopened # pr reopened
+  workflow_dispatch:
 
 env:
   # GitHub Container Registry

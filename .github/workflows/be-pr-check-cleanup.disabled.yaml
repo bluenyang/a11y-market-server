@@ -1,17 +1,17 @@
 name: BE | PR Check - Cleanup
 
 on:
-  pull_request:
-    branches:
-      - develop
-    types:
-      - closed # when pr closed
+  # pull_request:
+  #   branches:
+  #     - develop
+  #   types:
+  #     - closed # when pr closed
   workflow_dispatch:
-    inputs:
-      pr_number:
-        description: '삭제할 PR 번호 (숫자만 입력)'
-        required: true
-        type: string
+  # inputs:
+  #   pr_number:
+  #     description: '삭제할 PR 번호 (숫자만 입력)'
+  #     required: true
+  #     type: string
 
 jobs:
   cleanup:
