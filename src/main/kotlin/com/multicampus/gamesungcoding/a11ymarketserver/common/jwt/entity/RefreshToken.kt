@@ -1,46 +1,34 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.entity;
+package com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.entity
 
-import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.Users;
-import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.Users
+import jakarta.persistence.*
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
+import java.time.LocalDateTime
+import java.util.*
 
 @Entity
-@Getter
-@NoArgsConstructor(access = lombok.AccessLevel.PROTECTED)
-public class RefreshToken {
+class RefreshToken(
+    @OneToOne(cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    var user: Users,
+
+    @Column(nullable = false, unique = true)
+    var token: String,
+
+    @Column(nullable = false)
+    var expiryDate: LocalDateTime
+) {
     @Id
     @UuidV7
     @Column(length = 16, updatable = false, nullable = false)
-    private UUID refreshTokenId;
+    var refreshTokenId: UUID? = null
+        private set
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Users user;
-
-    @Column(nullable = false, unique = true)
-    private String token;
-
-    @Column(nullable = false)
-    private LocalDateTime expiryDate;
-
-    @Builder
-    private RefreshToken(Users user, String token, LocalDateTime expiryDate) {
-        this.user = user;
-        this.token = token;
-        this.expiryDate = expiryDate;
-    }
-
-    public void updateToken(String token, LocalDateTime expiryDate) {
-        this.token = token;
-        this.expiryDate = expiryDate;
+    fun updateToken(token: String, expiryDate: LocalDateTime) {
+        this.token = token
+        this.expiryDate = expiryDate
     }
 }

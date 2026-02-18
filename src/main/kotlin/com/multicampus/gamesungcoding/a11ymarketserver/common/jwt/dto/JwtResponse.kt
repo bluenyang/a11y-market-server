@@ -1,4 +1,4 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.dto;
+package com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.dto
 
-public record JwtResponse(String accessToken, String refreshToken) {
-}
+@JvmRecord
+data class JwtResponse(val accessToken: String, val refreshToken: String)

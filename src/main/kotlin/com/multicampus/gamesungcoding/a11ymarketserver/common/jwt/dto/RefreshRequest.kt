@@ -1,6 +1,9 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.dto;
+package com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.dto
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank
 
-public record RefreshRequest(@NotNull String refreshToken) {
-}
+@JvmRecord
+data class RefreshRequest(
+    @field:NotBlank("Refresh Token is Required")
+    val refreshToken: String?
+)
