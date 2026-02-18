@@ -1,7 +1,3 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.common.exception;
+package com.multicampus.gamesungcoding.a11ymarketserver.common.exception
 
-public class DataNotFoundException extends RuntimeException {
-    public DataNotFoundException(String message) {
-        super(message);
-    }
-}
+class DataNotFoundException(message: String?) : RuntimeException(message)
