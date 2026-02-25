@@ -1,21 +1,14 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.common.properties;
+package com.multicampus.gamesungcoding.a11ymarketserver.common.properties
 
+import org.springframework.boot.context.properties.ConfigurationProperties
 
-import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
-import org.springframework.validation.annotation.Validated;
-
-@Getter
-@Setter
-@Component
-@Validated
 @ConfigurationProperties(prefix = "app.s3")
-public class S3StorageProperties {
-    @NotBlank(message = "S3 bucket name must not be blank")
-    private String bucket;
-
-    private String cdnUrl;
+data class S3StorageProperties(
+    val bucket: String,
+    val cdnUrl: String
+) {
+    init {
+        require(bucket.isNotBlank()) { "S3 버킷 이름은 비어 있을 수 없습니다." }
+        require(cdnUrl.startsWith("http")) { "CDN URL은 http 또는 https로 시작해야 합니다." }
+    }
 }

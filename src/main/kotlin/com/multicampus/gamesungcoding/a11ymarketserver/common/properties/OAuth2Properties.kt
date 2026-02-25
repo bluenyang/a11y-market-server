@@ -1,15 +1,9 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.common.properties;
+package com.multicampus.gamesungcoding.a11ymarketserver.common.properties
 
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
+import org.springframework.boot.context.properties.ConfigurationProperties
 
-@Getter
-@Setter
-@Component
 @ConfigurationProperties(prefix = "oauth2")
-public class OAuth2Properties {
-    private String redirectUri;
-    private String signupUri;
-}
+data class OAuth2Properties(
+    val redirectUri: String,
+    val signupUri: String
+)
