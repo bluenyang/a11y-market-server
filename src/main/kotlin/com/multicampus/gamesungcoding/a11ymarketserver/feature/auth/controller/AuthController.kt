@@ -21,85 +21,62 @@ class AuthController(
 ) {
 
     @PostMapping("/v1/auth/login")
-    fun login(@RequestBody dto: LoginRequest): ResponseEntity<LoginResponse> {
-        return ResponseEntity.ok(authService.login(dto))
-    }
+    fun login(@RequestBody dto: LoginRequest): ResponseEntity<LoginResponse> =
+        ResponseEntity.ok(authService.login(dto))
+
 
     @PostMapping("/v1/auth/login-refresh")
-    fun loginRefresh(
-        @Valid @RequestBody dto: RefreshRequest
-    ): ResponseEntity<LoginResponse> {
-        return ResponseEntity.ok(authService.loginRefresh(dto.refreshToken!!))
-    }
+    fun loginRefresh(@Valid @RequestBody dto: RefreshRequest): ResponseEntity<LoginResponse> =
+        ResponseEntity.ok(authService.loginRefresh(dto.refreshToken))
+
 
     @PostMapping("/v1/auth/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    fun logout(
-        @AuthenticationPrincipal userDetails: UserDetails
-    ): ResponseEntity<String> {
-        val userEmail = userDetails.username
-
-        authService.logout(userEmail)
-        return ResponseEntity.ok("SUCCESS")
+    fun logout(@AuthenticationPrincipal userDetails: UserDetails): ResponseEntity<Void> {
+        authService.logout(userDetails.username)
+        return ResponseEntity.noContent().build()
     }
 
     @PostMapping("/v1/auth/refresh")
-    fun refreshToken(
-        @Valid @RequestBody refreshRequest: RefreshRequest
-    ): ResponseEntity<JwtResponse> {
-        return ResponseEntity.ok(
-            authService.reissueToken(refreshRequest.refreshToken!!)
-        )
-    }
+    fun refreshToken(@Valid @RequestBody refreshRequest: RefreshRequest): ResponseEntity<JwtResponse> =
+        ResponseEntity.ok(authService.reissueToken(refreshRequest.refreshToken))
+
 
     @PostMapping("/v1/auth/join")
     @ResponseStatus(HttpStatus.CREATED)
-    fun join(
-        @RequestBody @Valid dto: JoinRequest
-    ): ResponseEntity<UserResponse> {
-        return ResponseEntity
+    fun join(@RequestBody @Valid dto: JoinRequest): ResponseEntity<UserResponse> =
+        ResponseEntity
             .created(URI.create("/api/v1/users/me"))
             .body(authService.join(dto))
-    }
 
     @PostMapping("/v1/auth/kakao-join")
     @ResponseStatus(HttpStatus.CREATED)
     fun kakaoJoin(
         @AuthenticationPrincipal principal: UserDetails,
         @RequestBody dto: KakaoSignUpRequest
-    ): ResponseEntity<UserResponse> {
-        val userOauthLinkId = UUID.fromString(principal.username)
-
-        return ResponseEntity
+    ): ResponseEntity<UserResponse> =
+        ResponseEntity
             .created(URI.create("/api/v1/users/me"))
-            .body(authService.kakaoJoin(userOauthLinkId, dto))
-    }
+            .body(authService.kakaoJoin(UUID.fromString(principal.username), dto))
 
     @GetMapping("/v1/auth/me/info")
     fun getLoginUserInfo(
         @AuthenticationPrincipal userDetails: UserDetails
-    ): ResponseEntity<LoginResponse> {
-        val response = authService.getUserInfo(
-            UUID.fromString(userDetails.username)
-        )
-        return ResponseEntity.ok(response)
-    }
+    ): ResponseEntity<LoginResponse> =
+        ResponseEntity.ok(authService.getUserInfo(UUID.fromString(userDetails.username)))
+
 
     @GetMapping("/v1/auth/check/email")
-    fun checkEmail(@RequestParam email: String): ResponseEntity<CheckExistsResponse> {
-        val exists = authService.isEmailDuplicate(email)
-        return ResponseEntity.ok(exists)
-    }
+    fun checkEmail(
+        @RequestParam email: String
+    ): ResponseEntity<CheckExistsResponse> =
+        ResponseEntity.ok(authService.isEmailDuplicate(email))
 
     @GetMapping("/v1/auth/check/phone")
-    fun checkPhone(@RequestParam phone: String): ResponseEntity<CheckExistsResponse> {
-        val exists = authService.isPhoneDuplicate(phone)
-        return ResponseEntity.ok(exists)
-    }
+    fun checkPhone(@RequestParam phone: String): ResponseEntity<CheckExistsResponse> =
+        ResponseEntity.ok(authService.isPhoneDuplicate(phone))
 
     @GetMapping("/v1/auth/check/nickname")
-    fun checkNickname(@RequestParam nickname: String): ResponseEntity<CheckExistsResponse> {
-        val exists = authService.isNicknameDuplicate(nickname)
-        return ResponseEntity.ok(exists)
-    }
+    fun checkNickname(@RequestParam nickname: String): ResponseEntity<CheckExistsResponse> =
+        ResponseEntity.ok(authService.isNicknameDuplicate(nickname))
 }
