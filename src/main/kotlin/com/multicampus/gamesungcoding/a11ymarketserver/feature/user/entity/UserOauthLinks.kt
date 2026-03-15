@@ -1,54 +1,39 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity
 
-import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7;
-import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7
+import jakarta.persistence.*
+import org.hibernate.annotations.OnDelete
+import org.hibernate.annotations.OnDeleteAction
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import java.time.LocalDateTime
+import java.util.*
 
 @Entity
-@Getter
-@Builder
 @Table(name = "user_oauth_links")
-@EntityListeners(AuditingEntityListener.class)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class UserOauthLinks {
+@EntityListeners(AuditingEntityListener::class)
+class UserOauthLinks(
+    @Column(length = 50)
+    val oauthProvider: String,
+
+    @Column
+    val oauthProviderId: String,
+
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", unique = true)
+    var user: Users?,
+) {
     @Id
     @UuidV7
     @Column(length = 16, nullable = false, updatable = false)
-    private UUID userOauthLinkId;
-
-    @JoinColumn(name = "user_id", unique = true)
-    @OneToOne(fetch = FetchType.LAZY)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    private Users user;
-
-    @Column(length = 50)
-    private String oauthProvider;
-
-    @Column
-    private String oauthProviderId;
+    val userOauthLinkId: UUID? = null
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    val createdAt: LocalDateTime? = null
 
-    @Builder
-    private UserOauthLinks(Users user,
-                           String oauthProvider,
-                           String oauthProviderId) {
-        this.user = user;
-        this.oauthProvider = oauthProvider;
-        this.oauthProviderId = oauthProviderId;
-    }
-
-    public void updateUser(Users user) {
-        this.user = user;
+    fun updateUser(user: Users?) {
+        this.user = user
     }
 }

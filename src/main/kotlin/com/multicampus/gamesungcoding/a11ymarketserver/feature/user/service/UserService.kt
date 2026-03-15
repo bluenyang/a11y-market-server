@@ -8,10 +8,12 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.service.SellerService
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserDeleteRequest
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserPWUpdateRequest
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserResponse
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserUpdateRequest
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.UserRole
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.Users
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.mapper.toResponse
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserOauthLinksRepository
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository
 import org.slf4j.LoggerFactory
@@ -35,7 +37,7 @@ class UserService(
 
     // 마이페이지 - 회원 정보 조회
     fun getUserInfo(userEmail: String): UserResponse =
-        UserResponse.fromEntity(getUserByEmail(userEmail))
+        getUserByEmail(userEmail).toResponse()
 
 
     // 마이페이지 - 회원 정보 수정
@@ -43,7 +45,20 @@ class UserService(
     fun updateUserInfo(userEmail: String, dto: UserUpdateRequest): UserResponse {
         val user = getUserByEmail(userEmail)
         user.updateUserInfo(dto)
-        return UserResponse.fromEntity(user)
+        return user.toResponse()
+    }
+
+    @Transactional
+    fun updateUserPassword(userEmail: String, dto: UserPWUpdateRequest) {
+        val user = getUserByEmail(userEmail)
+        val currentPassword = user.userPass
+            ?: throw InvalidRequestException("현재 비밀번호가 설정되어 있지 않습니다.")
+
+        if (!passwordEncoder.matches(dto.currentPassword, currentPassword)) {
+            throw InvalidRequestException("현재 비밀번호가 일치하지 않습니다.")
+        }
+
+        user.updatePassword(passwordEncoder.encode(dto.newPassword))
     }
 
     @Transactional
@@ -51,7 +66,11 @@ class UserService(
         val user = getUserByEmail(userEmail)
         val isOauthUser = userOauthLinksRepository.existsByUser(user)
 
-        if (!passwordEncoder.matches(req.userPassword, user.userPass) && !isOauthUser) {
+        val isPasswordMatch = user.userPass?.let {
+            passwordEncoder.matches(req.userPassword, it)
+        } ?: false
+
+        if (!isPasswordMatch && !isOauthUser) {
             throw InvalidRequestException("비밀번호가 일치하지 않습니다.")
         }
 

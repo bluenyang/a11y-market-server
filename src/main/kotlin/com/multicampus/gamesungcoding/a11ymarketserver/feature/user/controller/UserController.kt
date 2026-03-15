@@ -31,6 +31,15 @@ class UserController(
     ): UserResponse =
         userService.updateUserInfo(userDetails.username, request)
 
+    // 비밀번호 수정
+    @PatchMapping("/me/password")
+    fun updatePassword(
+        @AuthenticationPrincipal userDetails: UserDetails,
+        @Valid @RequestBody request: UserUpdateRequest,
+    ) {
+        userService.updateUserPassword(userDetails.username, request)
+    }
+
 
     @PostMapping("/me/withdraw")
     @ResponseStatus(HttpStatus.NO_CONTENT)

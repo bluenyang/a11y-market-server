@@ -2,6 +2,7 @@ package com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.dto
 
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserInfo
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.Users
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.mapper.toInfo
 
 data class LoginResponse(
     val user: UserInfo,
@@ -11,7 +12,7 @@ data class LoginResponse(
     companion object {
         fun fromEntityAndTokens(user: Users, accessToken: String, refreshToken: String) =
             LoginResponse(
-                user = UserInfo.fromEntity(user),
+                user = user.toInfo(),
                 accessToken = accessToken,
                 refreshToken = refreshToken
             )

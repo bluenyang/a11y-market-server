@@ -1,6 +1,5 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto
 
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.UserA11yProfile
 import java.time.LocalDateTime
 import java.util.*
 
@@ -19,26 +18,4 @@ data class UserA11yProfileResponse(
     val cursorHighlight: Boolean,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
-) {
-    companion object {
-        fun fromEntity(p: UserA11yProfile): UserA11yProfileResponse {
-            val pi = p.getProfileInfo()
-            return UserA11yProfileResponse(
-                p.profileId,
-                pi.profileName,
-                pi.description,
-                pi.contrastLevel,
-                pi.textSizeLevel,
-                pi.textSpacingLevel,
-                pi.lineHeightLevel,
-                pi.textAlign,
-                pi.screenReader,
-                pi.smartContrast,
-                pi.highlightLinks,
-                pi.cursorHighlight,
-                p.createdAt,
-                p.updatedAt
-            )
-        }
-    }
-}
+)

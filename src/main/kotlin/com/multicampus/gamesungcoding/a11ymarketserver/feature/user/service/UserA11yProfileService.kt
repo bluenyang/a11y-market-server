@@ -8,6 +8,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserA11y
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.A11yProfileInfo
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.UserA11yProfile
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.Users
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.mapper.toA11yProfileResponse
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserA11yProfileRepository
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository
 import org.springframework.stereotype.Service
@@ -25,7 +26,7 @@ class UserA11yProfileService(
     fun getMyProfiles(userEmail: String): List<UserA11yProfileResponse> {
         val user = getUserByEmail(userEmail)
         val list: List<UserA11yProfile> = profileRepository.findAllByUserOrderByCreatedAtAsc(user)
-        return list.map { UserA11yProfileResponse.fromEntity(it) }.toList()
+        return list.map { it.toA11yProfileResponse() }.toList()
     }
 
 
@@ -39,26 +40,24 @@ class UserA11yProfileService(
             throw InvalidRequestException("이미 존재하는 프로필 이름입니다.")
         }
 
-        val profile = UserA11yProfile.builder()
-            .user(user)
-            .profileInfo(
-                A11yProfileInfo.builder()
-                    .profileName(dto.profileName)
-                    .description(dto.description)
-                    .contrastLevel(dto.contrastLevel)
-                    .textSizeLevel(dto.textSizeLevel)
-                    .textSpacingLevel(dto.textSpacingLevel)
-                    .lineHeightLevel(dto.lineHeightLevel)
-                    .textAlign(dto.textAlign)
-                    .screenReader(dto.screenReader)
-                    .smartContrast(dto.smartContrast)
-                    .highlightLinks(dto.highlightLinks)
-                    .cursorHighlight(dto.cursorHighlight)
-                    .build()
+        val profile = UserA11yProfile(
+            user = user,
+            profileInfo = A11yProfileInfo(
+                profileName = dto.profileName,
+                description = dto.description,
+                contrastLevel = dto.contrastLevel,
+                textSizeLevel = dto.textSizeLevel,
+                textSpacingLevel = dto.textSpacingLevel,
+                lineHeightLevel = dto.lineHeightLevel,
+                textAlign = dto.textAlign,
+                screenReader = dto.screenReader,
+                smartContrast = dto.smartContrast,
+                highlightLinks = dto.highlightLinks,
+                cursorHighlight = dto.cursorHighlight
             )
-            .build()
+        )
 
-        return UserA11yProfileResponse.fromEntity(profileRepository.save(profile))
+        return profileRepository.save(profile).toA11yProfileResponse()
     }
 
     // 프로필 수정
@@ -76,19 +75,19 @@ class UserA11yProfileService(
             throw InvalidRequestException("이미 존재하는 프로필 이름입니다.")
         }
 
-        val info = A11yProfileInfo.builder()
-            .profileName(dto.profileName)
-            .description(dto.description)
-            .contrastLevel(dto.contrastLevel)
-            .textSizeLevel(dto.textSizeLevel)
-            .textSpacingLevel(dto.textSpacingLevel)
-            .lineHeightLevel(dto.lineHeightLevel)
-            .textAlign(dto.textAlign)
-            .screenReader(dto.screenReader)
-            .smartContrast(dto.smartContrast)
-            .highlightLinks(dto.highlightLinks)
-            .cursorHighlight(dto.cursorHighlight)
-            .build()
+        val info = A11yProfileInfo(
+            profileName = dto.profileName,
+            description = dto.description,
+            contrastLevel = dto.contrastLevel,
+            textSizeLevel = dto.textSizeLevel,
+            textSpacingLevel = dto.textSpacingLevel,
+            lineHeightLevel = dto.lineHeightLevel,
+            textAlign = dto.textAlign,
+            screenReader = dto.screenReader,
+            smartContrast = dto.smartContrast,
+            highlightLinks = dto.highlightLinks,
+            cursorHighlight = dto.cursorHighlight
+        )
 
         profile.update(info)
     }

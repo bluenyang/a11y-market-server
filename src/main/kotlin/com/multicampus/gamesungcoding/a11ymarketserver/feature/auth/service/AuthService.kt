@@ -12,6 +12,7 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.auth.status.Check
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserResponse
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.UserRole
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity.Users
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.mapper.toResponse
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserOauthLinksRepository
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.repository.UserRepository
 import org.springframework.data.repository.findByIdOrNull
@@ -112,17 +113,15 @@ class AuthService(
             throw DataDuplicatedException("이미 존재하는 이메일입니다.")
         }
 
-        val user = Users.builder()
-            .userEmail(dto.userEmail)
-            // 비밀번호 암호화
-            .userPass(passwordEncoder.encode(dto.userPass))
-            .userName(dto.userName)
-            .userNickname(dto.userNickname)
-            .userPhone(dto.userPhone)
-            .userRole(UserRole.USER)
-            .build()
-
-        return UserResponse.fromEntity(userRepository.save(user))
+        val user = Users(
+            userEmail = dto.userEmail,
+            userPass = passwordEncoder.encode(dto.userPass), // 비밀번호 암호화
+            userName = dto.userName,
+            userNickname = dto.userNickname,
+            userPhone = dto.userPhone,
+            userRole = UserRole.USER
+        )
+        return userRepository.save(user).toResponse()
     }
 
     @Transactional
@@ -138,18 +137,18 @@ class AuthService(
         }
 
         val user = userRepository.save(
-            Users.builder()
-                .userEmail(dto.userEmail)
-                .userName(dto.userName)
-                .userNickname(dto.userNickname)
-                .userRole(UserRole.USER)
-                .build()
+            Users(
+                userEmail = dto.userEmail,
+                userName = dto.userName,
+                userNickname = dto.userNickname,
+                userRole = UserRole.USER
+            )
         )
 
         oauthLink.updateUser(user)
-        oauthLink = userOauthLinksRepository.save(oauthLink)
+        userOauthLinksRepository.save(oauthLink)
 
-        return UserResponse.fromEntity(oauthLink.user)
+        return user.toResponse()
     }
 
     // 이메일 중복 체크 API용
@@ -184,7 +183,9 @@ class AuthService(
 
     private fun getUserByRefreshToken(refreshToken: String): Users {
         val dbToken = refreshTokenService.verifyRefreshToken(refreshToken)
-        return userRepository.findByIdOrNull(dbToken.user.userId)
+        val validUserId = requireNotNull(dbToken.user.userId) { "User ID in RefreshToken cannot be null" }
+
+        return userRepository.findByIdOrNull(validUserId)
             ?: throw DataNotFoundException("User not found for: " + dbToken.user.userEmail)
     }
 }

@@ -12,7 +12,7 @@ data class KakaoSignUpRequest(
     @field:NotBlank(message = "이름은 필수 입력 값입니다.")
     val userName: String,
 
-    val userNickname: String? = null,
+    val userNickname: String,
 
     @field:NotBlank(message = "전화번호는 필수 입력 값입니다.")
     @field:Pattern(regexp = "^[0-9]{10,15}$", message = "전화번호는 숫자만 포함해야 합니다.")

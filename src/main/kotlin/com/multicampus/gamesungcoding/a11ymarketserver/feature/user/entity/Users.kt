@@ -1,87 +1,71 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity
 
-import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.Seller;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserUpdateRequest;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
-import java.time.LocalDateTime;
-import java.util.UUID;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.id.UuidV7
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.Seller
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.user.dto.UserUpdateRequest
+import jakarta.persistence.*
+import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.jpa.domain.support.AuditingEntityListener
+import java.time.LocalDateTime
+import java.util.*
 
 @Entity
-@Getter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-public class Users {
-    @Id
-    @UuidV7
-    @Column(length = 16, updatable = false, nullable = false)
-    private UUID userId;
-
+@Table(name = "users")
+@EntityListeners(AuditingEntityListener::class)
+class Users(
     @Column(length = 30)
-    private String userName;
-
-    @Column(length = 100)
-    private String userPass;
+    var userName: String,
 
     @Column(length = 50)
-    private String userEmail;
-
-    @Column(length = 15)
-    private String userPhone;
+    var userEmail: String,
 
     @Column(length = 20)
-    private String userNickname;
+    var userNickname: String,
 
     @Enumerated(EnumType.STRING)
     @Column(length = 30)
-    private UserRole userRole;
+    var userRole: UserRole,
+
+    @Column(length = 100)
+    var userPass: String? = null,
+
+    @Column(length = 15)
+    var userPhone: String? = null,
+) {
+    @Id
+    @UuidV7
+    @Column(length = 16, updatable = false, nullable = false)
+    val userId: UUID? = null
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    val createdAt: LocalDateTime? = null
 
     @LastModifiedDate
     @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    var updatedAt: LocalDateTime? = null
+        private set
 
     @OneToOne(mappedBy = "user")
-    private Seller seller;
-
+    var seller: Seller? = null
+        private set
 
     // 회원 정보 수정
-    public void updateUserInfo(UserUpdateRequest request) {
-        if (request.userName() != null) {
-            this.userName = request.userName();
-        }
-        if (request.userEmail() != null) {
-            this.userEmail = request.userEmail();
-        }
-        if (request.userPhone() != null) {
-            this.userPhone = request.userPhone();
-        }
-        if (request.userNickname() != null) {
-            this.userNickname = request.userNickname();
-        }
+    fun updateUserInfo(request: UserUpdateRequest) {
+        request.userName?.let { this.userName = it }
+        request.userEmail?.let { this.userEmail = it }
+        request.userPhone?.let { this.userPhone = it }
+        request.userNickname?.let { this.userNickname = it }
     }
 
     // 비밀번호 변경 메소드
-    public void updatePassword(String encodedPassword) {
-        this.userPass = encodedPassword;
+    fun updatePassword(encodedPassword: String) {
+        this.userPass = encodedPassword
     }
 
     // 사용자 권한 변경 메소드
-    public void changeRole(UserRole role) {
-        this.userRole = role;
+    fun changeRole(role: UserRole) {
+        this.userRole = role
     }
-
 }

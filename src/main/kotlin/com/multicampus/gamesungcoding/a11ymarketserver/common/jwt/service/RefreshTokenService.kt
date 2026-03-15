@@ -31,7 +31,9 @@ class RefreshTokenService(
         val newToken: String = UUID.randomUUID().toString()
         val expiryDate = LocalDateTime.now().plusSeconds(refreshTokenValidityMs / 1000)
 
-        val existingToken = refreshTokenRepository.findByUserUserId(user.userId)
+        val existingToken = refreshTokenRepository.findByUserUserId(
+            requireNotNull(user.userId) { "User ID in RefreshToken cannot be null" }
+        )
         if (existingToken != null) {
             log.debug(
                 "RefreshTokenService - updateRefreshToken: Updating existing refresh token for userId {}",

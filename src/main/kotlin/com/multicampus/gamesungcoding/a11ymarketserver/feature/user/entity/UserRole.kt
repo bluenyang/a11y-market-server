@@ -1,6 +1,6 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.user.entity
 
-public enum UserRole {
+enum class UserRole {
     USER,
     SELLER,
     ADMIN,
