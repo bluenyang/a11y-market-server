@@ -1,5 +1,6 @@
 package com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.service
 
+import com.github.f4b6a3.uuid.alt.GUID
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotFoundException
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.entity.RefreshToken
 import com.multicampus.gamesungcoding.a11ymarketserver.common.jwt.repository.RefreshTokenRepository
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
 import java.time.LocalDateTime
-import java.util.*
 
 @Component
 class RefreshTokenService(
@@ -23,12 +23,12 @@ class RefreshTokenService(
 
     @Transactional
     fun createRefreshToken(authentication: Authentication): String {
-        val userEmail = authentication.name
+        val uid = authentication.name
 
-        val user = userRepository.findByUserEmail(userEmail)
-            ?: throw DataNotFoundException("User not found with email: $userEmail")
+        val user = userRepository.findByUserEmail(uid)
+            ?: throw DataNotFoundException("User not found with uid: $uid")
 
-        val newToken: String = UUID.randomUUID().toString()
+        val newToken: String = GUID.v7().toString()
         val expiryDate = LocalDateTime.now().plusSeconds(refreshTokenValidityMs / 1000)
 
         val existingToken = refreshTokenRepository.findByUserUserId(

@@ -42,7 +42,7 @@ class AuthService(
             ?: throw UserNotFoundException("이메일 또는 비밀번호가 올바르지 않습니다.")
 
         val authentication = authenticationManager.authenticate(
-            UsernamePasswordAuthenticationToken(dto.email, dto.password)
+            UsernamePasswordAuthenticationToken(user.userId, user.userPass)
         )
 
         return LoginResponse.fromEntityAndTokens(
@@ -56,7 +56,7 @@ class AuthService(
     fun loginRefresh(refreshToken: String): LoginResponse {
         // get refresh token from DB and verifying validation
         val user = getUserByRefreshToken(refreshToken)
-        val userDetails = userDetailsService.loadUserByUsername(user.userEmail)
+        val userDetails = userDetailsService.loadUserByUsername(user.userId.toString())
 
         val newAuthentication = UsernamePasswordAuthenticationToken(
             userDetails,
@@ -77,7 +77,7 @@ class AuthService(
             ?: throw UserNotFoundException("유효하지 않은 사용자입니다.")
 
         val authentication: Authentication = UsernamePasswordAuthenticationToken(
-            user.userEmail,
+            user.userId,
             null,
             listOf(SimpleGrantedAuthority(user.userRole.name))
         )
@@ -92,7 +92,7 @@ class AuthService(
     @Transactional
     fun reissueToken(refreshToken: String): JwtResponse {
         val user = getUserByRefreshToken(refreshToken)
-        val userDetails = userDetailsService.loadUserByUsername(user.userEmail)
+        val userDetails = userDetailsService.loadUserByUsername(user.userId.toString())
 
         val newAuthentication = UsernamePasswordAuthenticationToken(
             userDetails,
@@ -130,7 +130,7 @@ class AuthService(
             throw DataDuplicatedException("이미 존재하는 이메일입니다.")
         }
 
-        var oauthLink = userOauthLinksRepository.findByIdOrNull(userOauthLinkId)
+        val oauthLink = userOauthLinksRepository.findByIdOrNull(userOauthLinkId)
             ?: throw DataNotFoundException("OAuth link not found for ID: $userOauthLinkId")
         if (oauthLink.user != null) {
             throw InvalidRequestException("이미 가입된 OAuth 링크입니다.")
