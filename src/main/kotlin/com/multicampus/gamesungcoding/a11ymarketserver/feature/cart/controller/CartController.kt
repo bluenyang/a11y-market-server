@@ -1,4 +1,4 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.address.cart.controller
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.controller
 
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.dto.*
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.cart.service.CartService
