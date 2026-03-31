@@ -16,7 +16,7 @@ class Addresses(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", updatable = false, nullable = false)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    val user: Users,
+    var user: Users,
 
     @Embedded
     var address: AddressInfo,
@@ -27,11 +27,11 @@ class Addresses(
     @Id
     @UuidV7
     @Column(length = 16, updatable = false, nullable = false)
-    val addressId: UUID? = null
+    var addressId: UUID? = null
 
     @CreatedDate
     @Column(nullable = false, updatable = false)
-    val createdAt: LocalDateTime? = null
+    var createdAt: LocalDateTime? = null
 
     fun updateAddrInfo(addressInfo: AddressInfo) {
         this.address = addressInfo
