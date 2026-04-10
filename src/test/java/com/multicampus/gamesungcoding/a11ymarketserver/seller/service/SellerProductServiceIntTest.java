@@ -100,12 +100,12 @@ class SellerProductServiceIntTest {
 
         var response = sellerService.registerProduct(userEmail, request, List.of(image));
 
-        Assertions.assertThat(response.productName()).isEqualTo("Integration Product");
+        Assertions.assertThat(response.productName).isEqualTo("Integration Product");
 
         Mockito.verify(s3Template).upload(ArgumentMatchers.eq("test-bucket"),
                 ArgumentMatchers.anyString(),
                 ArgumentMatchers.any(InputStream.class));
 
-        Assertions.assertThat(response.productId()).isNotNull();
+        Assertions.assertThat(response.productId).isNotNull();
     }
 }

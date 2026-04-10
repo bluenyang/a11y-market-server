@@ -56,7 +56,7 @@ public class ProductImages {
     }
 
     public void updateMetadata(ImageMetadata metadata) {
-        this.altText = metadata.altText();
-        this.imageSequence = metadata.sequence();
+        this.altText = metadata.altText;
+        this.imageSequence = metadata.sequence;
     }
 }

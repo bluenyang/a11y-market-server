@@ -197,7 +197,7 @@ public class SellerService {
         }
 
         for (var img : requestImages) {
-            if (img.isNew()) {
+            if (img.isNew) {
                 var newImages = saveImageWithMetadata(
                         images,
                         List.of(img),
@@ -207,7 +207,7 @@ public class SellerService {
                 product.getProductImages().addAll(newImages);
             } else {
                 var existsImage = dbImages.stream()
-                        .filter(imgEntity -> imgEntity.getImageId().equals(img.imageId()))
+                        .filter(imgEntity -> imgEntity.getImageId().equals(img.imageId))
                         .findFirst()
                         .orElseThrow(() -> new DataNotFoundException("기존 이미지 정보를 찾을 수 없습니다."));
                 existsImage.updateMetadata(img);
@@ -538,15 +538,15 @@ public class SellerService {
         List<ProductImages> savedImages = new ArrayList<>();
 
         for (var meta : metadataList) {
-            var image = fileMap.get(meta.originalFileName());
+            var image = fileMap.get(meta.originalFileName);
 
             String imageUrl = uploadImageToS3(image, sellerId, productId);
             var savedImg = productImagesRepository.save(
                     ProductImages.builder()
                             .product(productRepository.getReferenceById(productId))
                             .imageUrl(imageUrl)
-                            .altText(meta.altText())
-                            .imageSequence(meta.sequence())
+                            .altText(meta.altText)
+                            .imageSequence(meta.sequence)
                             .build()
             );
 
