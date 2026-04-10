@@ -1,94 +1,94 @@
-package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.service;
+package com.multicampus.gamesungcoding.a11ymarketserver.feature.product.service
 
-import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotFoundException;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDetailResponse;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductResponse;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Categories;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Product;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductAiSummaryRepository;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductImagesRepository;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.Seller;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Predicate;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotFoundException
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductDetailResponse
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.ProductResponse
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Categories
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Product
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductStatus
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductAiSummaryRepository
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductImagesRepository
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.Seller
+import jakarta.persistence.criteria.*
+import org.slf4j.LoggerFactory
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+import java.util.*
+import java.util.function.Supplier
 
 /**
  * - search 파라미터 유무에 따라 전체/필터 조회
  * - certified/grade는 스펙 확장 시 반영
  */
-@Slf4j
 @Service
-@RequiredArgsConstructor
-public class ProductService {
-    private final ProductRepository productRepository;
-    private final ProductImagesRepository productImagesRepository;
-    private final ProductAiSummaryRepository productAiSummaryRepository;
+class ProductService(
+    private val productRepository: ProductRepository,
+    private val productImagesRepository: ProductImagesRepository,
+    private val productAiSummaryRepository: ProductAiSummaryRepository
+) {
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     @Transactional(readOnly = true)
-    public List<ProductResponse> getProducts(String search,
-                                             Boolean certified,
-                                             String grade,
-                                             List<String> categoryIds) {
+    fun getProducts(
+        search: String?,
+        certified: Boolean?,
+        grade: String?,
+        categoryIds: List<String>?
+    ): List<ProductResponse> {
+        val spec = Specification<Product> { root: Root<Product>, _: CriteriaQuery<*>, builder: CriteriaBuilder ->
+            val predicates = mutableListOf<Predicate>()
 
-        Specification<Product> spec = (root, query, builder) -> {
-            List<Predicate> predicates = new ArrayList<>();
-            predicates.add(builder.equal(root.get("productStatus"), "APPROVED"));
+            predicates.add(builder.equal(root.get<String>("productStatus"), ProductStatus.APPROVED.name))
 
-            if (search != null) {
-                predicates.add(builder.like(root.get("productName"), "%" + search + "%"));
+            if (!search.isNullOrBlank()) {
+                predicates.add(builder.like(root.get("productName"), "%$search%"))
             }
 
-            Join<Product, Seller> sellerJoin = root.join("seller", JoinType.INNER);
-            if (certified != null && certified) {
-                predicates.add(builder.equal(sellerJoin.get("isA11yGuarantee"), true));
-            }
-            if (grade != null && !grade.isBlank()) {
-                predicates.add(builder.equal(sellerJoin.get("sellerGrade"), grade));
-            }
+            if (certified == true || !grade.isNullOrBlank()) {
+                val sellerJoin = root.join<Product, Seller>("seller", JoinType.INNER)
 
-            Join<Product, Categories> categoryJoin = root.join("category", JoinType.INNER);
-            if (categoryIds != null && !categoryIds.isEmpty()) {
-                var uuidList = categoryIds.stream()
-                        .map(UUID::fromString)
-                        .toList();
-
-                var isCategory = categoryJoin.get("categoryId").in(uuidList);
-                var isParentCategory = categoryJoin.get("parentCategory").get("categoryId").in(uuidList);
-
-                predicates.add(builder.or(isCategory, isParentCategory));
+                if (certified == true) { // Nullable Boolean
+                    predicates.add(builder.equal(sellerJoin.get<Boolean>("isA11yGuarantee"), true))
+                }
+                if (!grade.isNullOrBlank()) {
+                    predicates.add(builder.equal(sellerJoin.get<String>("sellerGrade"), grade))
+                }
             }
 
-            return builder.and(predicates.toArray(new Predicate[0]));
-        };
+            if (!categoryIds.isNullOrEmpty()) {
+                val categoryJoin = root.join<Product, Categories>("category", JoinType.INNER)
+                val uuidList = categoryIds.map { UUID.fromString(it) }
+
+                val isCategory = categoryJoin.get<UUID>("categoryId").`in`(uuidList)
+                val isParentCategory = categoryJoin.get<Categories>("parentCategory")
+                    .get<UUID>("categoryId")
+                    .`in`(uuidList)
+
+                predicates.add(builder.or(isCategory, isParentCategory))
+            }
+            builder.and(*predicates.toTypedArray())
+        }
 
 
-        var list = productRepository.findAll(spec)
-                .stream()
-                .map(ProductResponse::fromEntity)
-                .toList();
+        val list = productRepository.findAll(spec)
+            .map { ProductResponse.fromEntity(it) }
 
-        log.debug("Filtered products count: {}", list.size());
-        return list;
+        log.debug("Filtered products count: {}", list.size)
+        return list
     }
 
     @Transactional(readOnly = true)
-    public ProductDetailResponse getProductDetail(UUID productId) {
-        var product = productRepository.findById(productId)
-                .orElseThrow(() -> new DataNotFoundException("Invalid product ID: " + productId));
+    fun getProductDetail(productId: UUID): ProductDetailResponse {
+        val product = productRepository.findById(productId)
+            .orElseThrow(Supplier {
+                DataNotFoundException("Invalid product ID: $productId")
+            })
 
-        var productImages = productImagesRepository.findAllByProduct(product);
-        var productAiSummary = productAiSummaryRepository.findAllByProduct(product);
+        val productImages = productImagesRepository.findAllByProduct(product)
+        val productAiSummary = productAiSummaryRepository.findAllByProduct(product)
 
-        return ProductDetailResponse.fromEntity(product, productImages, productAiSummary);
+        return ProductDetailResponse.fromEntity(product, productImages, productAiSummary)
     }
 }
