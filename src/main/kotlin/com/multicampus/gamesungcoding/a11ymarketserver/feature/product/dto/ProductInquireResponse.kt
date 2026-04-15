@@ -15,6 +15,7 @@ data class ProductInquireResponse(
     val approvedAt: LocalDateTime?,
     val updatedAt: LocalDateTime?
 ) {
+    // TODO: Seller 변환시 삭제
     companion object {
         @JvmStatic
         fun fromEntity(product: Product): ProductInquireResponse {
@@ -24,7 +25,7 @@ data class ProductInquireResponse(
                 product.productPrice,
                 product.productStock,
                 product.productStatus,
-                product.category.categoryName,
+                product.category?.categoryName,
                 product.approvedDate,
                 product.updatedAt
             )

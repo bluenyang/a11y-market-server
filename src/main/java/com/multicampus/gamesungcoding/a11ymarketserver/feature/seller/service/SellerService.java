@@ -5,6 +5,8 @@ import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataDupl
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.DataNotFoundException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.exception.InvalidRequestException;
 import com.multicampus.gamesungcoding.a11ymarketserver.common.properties.S3StorageProperties;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductAiSummary;
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductImages;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItemStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.entity.OrderItems;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.order.repository.OrderItemsRepository;

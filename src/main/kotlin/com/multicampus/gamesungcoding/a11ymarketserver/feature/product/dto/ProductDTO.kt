@@ -18,6 +18,7 @@ data class ProductDTO(
     private var submitDate: LocalDateTime
 ) {
 
+    // TODO: Seller 기능 변환시 삭제
     companion object {
         @JvmStatic
         fun fromEntity(entity: Product): ProductDTO {

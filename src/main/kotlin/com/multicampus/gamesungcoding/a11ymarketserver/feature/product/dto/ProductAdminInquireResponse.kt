@@ -21,6 +21,7 @@ data class ProductAdminInquireResponse(
     val categoryName: String?,
     val submitDate: LocalDateTime
 ) {
+    // TODO: Admin 기능 migration 시 제거
     companion object {
         @JvmStatic
         fun fromEntity(product: Product): ProductAdminInquireResponse {

@@ -6,6 +6,8 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.dto.Produ
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Categories
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.Product
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductStatus
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.mapper.toDetailResponse
+import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.mapper.toResponse
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductAiSummaryRepository
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductImagesRepository
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository
@@ -73,7 +75,7 @@ class ProductService(
 
 
         val list = productRepository.findAll(spec)
-            .map { ProductResponse.fromEntity(it) }
+            .map { it.toResponse() }
 
         log.debug("Filtered products count: {}", list.size)
         return list
@@ -89,6 +91,6 @@ class ProductService(
         val productImages = productImagesRepository.findAllByProduct(product)
         val productAiSummary = productAiSummaryRepository.findAllByProduct(product)
 
-        return ProductDetailResponse.fromEntity(product, productImages, productAiSummary)
+        return product.toDetailResponse(productImages, productAiSummary)
     }
 }

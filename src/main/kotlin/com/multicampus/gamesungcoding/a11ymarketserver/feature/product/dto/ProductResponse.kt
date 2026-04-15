@@ -15,6 +15,7 @@ data class ProductResponse(
     val categoryId: UUID,
     val categoryName: String
 ) {
+    // TODO: Seller 변환시 삭제
     companion object {
         @JvmStatic
         fun fromEntity(product: Product): ProductResponse {
