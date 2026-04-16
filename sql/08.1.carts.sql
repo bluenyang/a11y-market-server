@@ -1,6 +1,7 @@
-CREATE TABLE carts (
-   cart_id RAW(16) PRIMARY KEY NOT NULL,
-   user_id RAW(16) NOT NULL,
-   CONSTRAINT fk_cart_user FOREIGN KEY ( user_id )
-      REFERENCES users ( user_id )
+CREATE TABLE carts
+(
+    cart_id UUID PRIMARY KEY NOT NULL,
+    user_id UUID             NOT NULL,
+    CONSTRAINT fk_cart_user FOREIGN KEY (user_id)
+        REFERENCES users (user_id)
 );
