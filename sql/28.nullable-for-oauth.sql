@@ -1,2 +1,3 @@
-ALTER TABLE user_oauth_links MODIFY
-   user_id RAW(16) NULL;
+ALTER TABLE user_oauth_links
+    ALTER COLUMN user_id TYPE uuid USING user_id::uuid,
+    ALTER COLUMN user_id DROP NOT NULL;
