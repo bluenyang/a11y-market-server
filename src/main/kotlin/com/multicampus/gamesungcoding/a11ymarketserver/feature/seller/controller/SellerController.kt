@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Content
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.web.bind.annotation.*
@@ -48,10 +47,8 @@ class SellerController(
             description = "Product registration data",
             content = [Content(mediaType = MediaType.APPLICATION_JSON_VALUE)]
         ) request: SellerProductRegisterRequest,
-
-        @RequestPart(value = "images", required = false) images: List<MultipartFile>
+        @RequestPart(value = "images", required = false) images: List<MultipartFile>?
     ): ProductDetailResponse = sellerService.registerProduct(userDetails.username, request, images)
-
 
     @GetMapping("/products")
     fun getMyProducts(
@@ -59,19 +56,15 @@ class SellerController(
         @ModelAttribute req: SellerInquireProductRequest
     ): List<ProductInquireResponse> = sellerService.getMyProducts(userDetails.username, req)
 
-
     @PutMapping(path = ["/products/{productId}"], consumes = [MediaType.MULTIPART_FORM_DATA_VALUE])
     fun updateProduct(
         @AuthenticationPrincipal userDetails: UserDetails,
-
         @PathVariable productId: String,
-
         @Valid @RequestPart("data") @Parameter(
             description = "Product registration data",
             content = [Content(mediaType = MediaType.APPLICATION_JSON_VALUE)]
-        ) request: @Valid SellerProductUpdateRequest,
-
-        @RequestPart(value = "images", required = false) images: List<MultipartFile>
+        ) request: SellerProductUpdateRequest,
+        @RequestPart(value = "images", required = false) images: List<MultipartFile>?
     ): ProductDTO =
         sellerService.updateProduct(
             userDetails.username,
@@ -80,30 +73,28 @@ class SellerController(
             images
         )
 
-
     @DeleteMapping("/products/{productId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteProduct(
         @AuthenticationPrincipal userDetails: UserDetails,
         @PathVariable productId: String
-    ): ResponseEntity<Void> {
+    ) {
         sellerService.deleteProduct(userDetails.username, UUID.fromString(productId))
-        return ResponseEntity.noContent().build()
     }
 
     @PatchMapping("/products/{productId}/stock")
     fun updateProductStock(
         @AuthenticationPrincipal userDetails: UserDetails,
         @PathVariable productId: String,
-        @RequestBody @Valid request: @Valid SellerProductStockUpdateRequest
+        @RequestBody @Valid request: SellerProductStockUpdateRequest
     ): ProductDTO = sellerService.updateProductStock(userDetails.username, UUID.fromString(productId), request)
 
     @GetMapping("/orders/items")
     fun getReceivedOrders(
         @AuthenticationPrincipal userDetails: UserDetails,
-        @RequestParam(required = false) page: Int,
-        @RequestParam(required = false) size: Int,
-        @RequestParam(required = false) orderItemStatus: OrderItemStatus
+        @RequestParam(required = false) page: Int?,
+        @RequestParam(required = false) size: Int?,
+        @RequestParam(required = false) orderItemStatus: OrderItemStatus?
     ): SellerOrderInquireResponse =
         sellerService.getReceivedOrders(userDetails.username, orderItemStatus, page, size)
 
@@ -117,28 +108,26 @@ class SellerController(
     fun updateOrderStatus(
         @AuthenticationPrincipal userDetails: UserDetails,
         @PathVariable orderItemId: String,
-        @RequestBody @Valid request: @Valid SellerOrderItemsStatusUpdateRequest
-    ): ResponseEntity<Void> {
+        @RequestBody @Valid request: SellerOrderItemsStatusUpdateRequest
+    ) {
         sellerService.updateOrderItemStatus(
             userDetails.username,
             UUID.fromString(orderItemId),
             request
         )
-        return ResponseEntity.noContent().build()
     }
 
     @PostMapping("/claims/{claimId}/approve")
     fun processOrderClaim(
         @AuthenticationPrincipal userDetails: UserDetails,
         @PathVariable claimId: String,
-        @RequestBody @Valid request: @Valid SellerOrderClaimProcessRequest
-    ): ResponseEntity<Void> {
+        @RequestBody @Valid request: SellerOrderClaimProcessRequest
+    ) {
         sellerService.processOrderClaim(
             userDetails.username,
             UUID.fromString(claimId),
             request
         )
-        return ResponseEntity.noContent().build()
     }
 
     @GetMapping("/claims")
@@ -158,14 +147,12 @@ class SellerController(
         @RequestParam(defaultValue = "12") month: Int
     ): List<DailyRevenueDto> = sellerDashboardService.getDailyRevenue(userDetails.username, year, month)
 
-
     @GetMapping("/dashboard/top-products")
     fun getTopProducts(
         @AuthenticationPrincipal userDetails: UserDetails,
         @RequestParam topN: Int
     ): List<SellerTopProductResponse> =
         sellerDashboardService.getTopProducts(userDetails.username, topN)
-
 
     @GetMapping("/dashboard/recent-orders")
     fun getRecentOrders(
