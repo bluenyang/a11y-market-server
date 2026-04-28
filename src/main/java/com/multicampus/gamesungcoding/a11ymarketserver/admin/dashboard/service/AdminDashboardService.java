@@ -3,7 +3,6 @@ package com.multicampus.gamesungcoding.a11ymarketserver.admin.dashboard.service;
 import com.multicampus.gamesungcoding.a11ymarketserver.admin.dashboard.dto.AdminDashboardStats;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.entity.ProductStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.product.repository.ProductRepository;
-import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.SellerSubmitStatus;
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

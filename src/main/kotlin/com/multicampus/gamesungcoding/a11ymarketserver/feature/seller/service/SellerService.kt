@@ -72,14 +72,14 @@ class SellerService(
             throw DataDuplicatedException("이미 판매자이거나 판매자 신청 이력이 존재합니다.")
         }
 
-        val seller = Seller.builder()
-            .user(user)
-            .sellerName(request.sellerName)
-            .businessNumber(request.businessNumber)
-            .sellerIntro(request.sellerIntro)
-            .build()
-
-        val saved = sellerRepository.save(seller)
+        val saved = sellerRepository.save(
+            Seller(
+                user = user,
+                sellerName = request.sellerName,
+                businessNumber = request.businessNumber,
+                sellerIntro = request.sellerIntro
+            )
+        )
 
         return saved.toApplyResponse()
     }
@@ -140,6 +140,10 @@ class SellerService(
     fun getMyProducts(userEmail: String, req: SellerInquireProductRequest): List<ProductInquireResponse> {
         val seller = sellerRepository.findByUserUserEmail(userEmail)
             ?: throw DataNotFoundException("판매자 정보를 찾을 수 없습니다.")
+
+        requireNotNull(seller.sellerId) {
+            throw DataNotFoundException("조회된 객체의 Id는 null일 수 없습니다.")
+        }
 
         val pageable = PageRequest.of(req.page, req.size)
         val products = productRepository.findBySellerSellerId(seller.sellerId, pageable)

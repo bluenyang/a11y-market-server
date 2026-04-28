@@ -40,6 +40,10 @@ class SellerDashboardService(
             throw InvalidRequestException("승인된 판매자만 대시보드를 조회할 수 있습니다.")
         }
 
+        requireNotNull(seller.sellerId) {
+            throw DataNotFoundException("조회된 객체의 Id는 null일 수 없습니다.")
+        }
+
         val stats = sellerDashboardRepository.findBySellerId(seller.sellerId)
 
         return if (stats == null) {

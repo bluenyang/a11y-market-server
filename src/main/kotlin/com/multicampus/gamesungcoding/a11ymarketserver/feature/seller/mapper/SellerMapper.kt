@@ -11,13 +11,12 @@ import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.dto.Seller
 import com.multicampus.gamesungcoding.a11ymarketserver.feature.seller.entity.Seller
 
 fun Seller.toApplyResponse(): SellerApplyResponse {
-    val user = this.user ?: throw DataNotFoundException("User info not found")
     return SellerApplyResponse(
         sellerId = this.sellerId ?: throw DataNotFoundException("Seller ID is missing"),
         sellerName = this.sellerName,
-        userName = user.userName,
-        userEmail = user.userEmail,
-        userPhone = user.userPhone ?: throw DataNotFoundException("User phone is missing"),
+        userName = this.user.userName,
+        userEmail = this.user.userEmail,
+        userPhone = this.user.userPhone ?: throw DataNotFoundException("User phone is missing"),
         businessNumber = this.businessNumber,
         sellerGrade = this.sellerGrade,
         sellerIntro = this.sellerIntro,
@@ -29,14 +28,13 @@ fun Seller.toApplyResponse(): SellerApplyResponse {
 }
 
 fun Seller.toInfoResponse(): SellerInfoResponse {
-    val user = this.user ?: throw DataNotFoundException("User info not found")
     return SellerInfoResponse(
         sellerId = this.sellerId ?: throw DataNotFoundException("Seller ID is missing"),
         sellerName = this.sellerName,
         businessNumber = this.businessNumber,
         sellerIntro = this.sellerIntro,
-        sellerEmail = user.userEmail,
-        sellerPhone = user.userPhone ?: throw DataNotFoundException("User phone is missing"),
+        sellerEmail = this.user.userEmail,
+        sellerPhone = this.user.userPhone ?: throw DataNotFoundException("User phone is missing"),
         isA11yGuarantee = this.isA11yGuarantee,
         sellerGrade = this.sellerGrade,
         products = this.products.map { it.toResponse() }
@@ -44,38 +42,36 @@ fun Seller.toInfoResponse(): SellerInfoResponse {
 }
 
 fun Seller.toProfileResponse(): SellerProfileResponse {
-    val user = this.user ?: throw DataNotFoundException("User info not found")
     return SellerProfileResponse(
         sellerId = this.sellerId ?: throw DataNotFoundException("Seller ID is missing"),
         sellerName = this.sellerName,
         businessNumber = this.businessNumber,
         sellerGrade = this.sellerGrade,
-        contactEmail = user.userEmail,
-        contactPhone = user.userPhone ?: throw DataNotFoundException("User phone is missing"),
+        contactEmail = this.user.userEmail,
+        contactPhone = this.user.userPhone ?: throw DataNotFoundException("User phone is missing"),
         storeIntro = this.sellerIntro,
         isA11yGuarantee = this.isA11yGuarantee,
         profileStatus = this.sellerSubmitStatus,
         submitDate = this.submitDate ?: throw DataNotFoundException("Submit date is missing"),
         approvedDate = this.approvedDate,
-        lastUpdatedDate = this.updatedAt
+        lastUpdatedDate = this.updatedAt ?: throw DataNotFoundException("Last updated date")
     )
 }
 
 fun Seller.toDetailResponse(ordersList: List<OrderItems>): SellerDetailResponse {
-    val user = this.user ?: throw DataNotFoundException("User info not found")
     return SellerDetailResponse(
         sellerId = this.sellerId ?: throw DataNotFoundException("Seller ID is missing"),
         sellerName = this.sellerName,
         businessNumber = this.businessNumber,
         sellerGrade = this.sellerGrade,
-        contactEmail = user.userEmail,
-        contactPhone = user.userPhone ?: throw DataNotFoundException("User phone is missing"),
+        contactEmail = this.user.userEmail,
+        contactPhone = this.user.userPhone ?: throw DataNotFoundException("User phone is missing"),
         storeIntro = this.sellerIntro,
         isA11yGuarantee = this.isA11yGuarantee,
         profileStatus = this.sellerSubmitStatus,
         submitDate = this.submitDate ?: throw DataNotFoundException("Submit date is missing"),
         approvedDate = this.approvedDate,
-        lastUpdatedDate = this.updatedAt,
+        lastUpdatedDate = this.updatedAt ?: throw DataNotFoundException("Last updated date"),
         orders = ordersList.map { it.toOrderItemResponse() },
         products = this.products.map { it.toInquireResponse() }
     )
